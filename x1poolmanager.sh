@@ -13,7 +13,7 @@ while true; do
     echo "1. Fund Pool"
     echo "2. Update Pool Validators"
     echo "3. Stake to Pool Validators"
-    echo "4. Unstake Validators"
+    echo "4. Unstake All Validators"
     echo "5. Withdraw from Pool"
     echo "6. Set Parameters"
     echo "7. Connect Pool"
@@ -37,14 +37,14 @@ while true; do
             ./start_validator.sh 
             ;;
         4)
-            echo "Unstaking Validators..."
+            echo "Unstaking and Removing all Validators from the Pool..."
             # Add your unstaking logic here
-            break
+            ./remove_all_validators.sh
             ;;
         5)
             echo "Withdrawing from Pool..."
             # Add your withdrawal logic here
-            break
+            ./withdraw_reserve.sh
             ;;
         6)
             echo "Setting Parameters..."

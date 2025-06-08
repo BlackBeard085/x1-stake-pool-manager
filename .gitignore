@@ -5,3 +5,4 @@ config.json
 chain_validators.csv
 add_to_pool.txt
 pool_keypairs.json
+remove-list.txt
