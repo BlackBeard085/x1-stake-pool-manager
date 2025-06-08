@@ -38,4 +38,7 @@ echo "Adding validators to pool with add-validators.sh..."
 echo "Removing validators from pool with remove-validators.sh..."
 ./remove-validators.sh "$stakePoolKeypair" remove_from_pool.txt
 
+echo "Updating Pool..."
+./update.sh 
+
 echo "Validator pool update process completed successfully."
