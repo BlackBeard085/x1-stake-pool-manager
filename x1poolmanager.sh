@@ -30,11 +30,13 @@ while true; do
             echo "Updating Pool, Prepool, and Shortlist..."
             # Add your update pool validators logic here
             ./update_pool_validators.sh
+            
             ;;
         3)
             echo "Staking to Pool Validators..."
             # Add your staking logic here
             ./stake_validators.sh 
+            ./update.sh 
             ;;
         4)
             echo "Unstaking and Removing all Validators from the Pool..."

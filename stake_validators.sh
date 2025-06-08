@@ -4,8 +4,8 @@
 POOL_KEYPAIRS_FILE="pool_keypairs.json"
 CONFIG_FILE="config.json"
 
-# Extract the first stakePoolKeypair path from pool_keypairs.json
-STAKE_POOL_KEYPAIR=$(jq -r '.[0].stakePoolKeypair' "$POOL_KEYPAIRS_FILE")
+# Extract the stakePoolKeypair path directly from the JSON object
+STAKE_POOL_KEYPAIR=$(jq -r '.stakePoolKeypair' "$POOL_KEYPAIRS_FILE")
 if [ -z "$STAKE_POOL_KEYPAIR" ] || [ "$STAKE_POOL_KEYPAIR" == "null" ]; then
   echo "Error: Could not find 'stakePoolKeypair' in $POOL_KEYPAIRS_FILE"
   exit 1
@@ -24,4 +24,3 @@ ADD_TO_POOL_FILE="add_to_pool.txt"
 # Execute the command
 ./rebalance.sh "$STAKE_POOL_KEYPAIR" "$ADD_TO_POOL_FILE" "$AMOUNT_FOR_EACH_VALIDATOR"
 
-./update.sh 
