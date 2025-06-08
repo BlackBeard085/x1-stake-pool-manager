@@ -3,7 +3,7 @@
 ## Requirements
 You will need to create a stake pool using the SPL Stake Pool program and have access to the generated keys for the stake pool.
 
-## Staring the Stake Pool Manager
+## Starting the Stake Pool Manager
 clone the Stake Pool manager and open the directory
 
 ```bash
