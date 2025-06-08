@@ -94,15 +94,10 @@ function pad(str, width) {
 async function countCsvEntries(filename) {
   try {
     const data = await readFile(filename, 'utf8');
-    const lines = data.split('\n')
-      .filter(line => line.trim() !== '' && !line.trim().startsWith('#') && !line.trim().toLowerCase().startsWith('header'));
+    const lines = data.split('\n').filter(line => line.trim() !== '' && !line.trim().startsWith('#') && !line.trim().toLowerCase().startsWith('header'));
     // Remove header line if present
     if (lines.length > 0 && lines[0].toLowerCase().includes('header')) {
       lines.shift();
-    }
-    // Exclude the first data line
-    if (lines.length > 0) {
-      lines.shift(); // remove the first line after header
     }
     return lines.length;
   } catch (err) {

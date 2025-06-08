@@ -23,17 +23,27 @@ const headers = [
   { id: 'Latency', title: 'Latency' },
 ];
 
-// Function to ensure pool_validators.csv exists
-function ensurePoolFile() {
-  if (!fs.existsSync(POOL_FILE)) {
-    // Create an empty CSV file with headers
+// Function to ensure pool_validators.csv exists and has headers
+async function ensurePoolFile() {
+  if (fs.existsSync(POOL_FILE)) {
+    // Check if file is empty
+    const stats = fs.statSync(POOL_FILE);
+    if (stats.size === 0) {
+      // File exists but is empty, write headers
+      const csvWriter = createObjectCsvWriter({
+        path: POOL_FILE,
+        header: headers,
+      });
+      await csvWriter.writeRecords([]); // write headers
+    }
+    // Else, assume headers present
+  } else {
+    // File doesn't exist, create with headers
     const csvWriter = createObjectCsvWriter({
       path: POOL_FILE,
       header: headers,
     });
-    return csvWriter.writeRecords([]); // Write empty array to create file
-  } else {
-    return Promise.resolve();
+    await csvWriter.writeRecords([]); // create file with headers
   }
 }
 
