@@ -15,3 +15,25 @@ Start the Pool Manager
    ./x1poolmanager.sh
    ```
 
+Opening Dash
+## (pic placeholder)
+
+A notification on dash will prompt user to connect a pool to the manager.
+
+## Connecting a SPL Stake Pool
+
+On the opening dash, select Option 7, Connect Pool, to set up your SPL Stake Pool with the stake pool manager. you will asked to input the keypair paths to the SOL Stake Pool generated accounts and also the path to the spl-stake-pool binary or command prompt. 
+
+'''bash
+   Please enter X1 Stake Pool keypair:
+   Please enter Stake Pool Reserve keypair path:
+   Please enter Mint keypair path:
+   Please enter Funding authority keypair path:
+   Please enter Deposit authority keypair path:
+   Enter your preferred spl-stake-pool command:
+   bash
+
+Once Connected the pool details will show upon the dashboard.
+## (pic placeholder)
+
+## Setting up Shortlist Parameters
