@@ -33,7 +33,9 @@ On the opening dash, select Option 7, Connect Pool, to set up your SPL Stake Poo
    Enter your preferred spl-stake-pool command:
    bash
 
-Once Connected the pool details will show upon the dashboard.
+Once Connected, the pool details will show upon the dashboard.
 ## (pic placeholder)
 
 ## Setting up Shortlist Parameters
+Select Option 6 to set the parameters the validators will be vetted againat to be shortlisted.
+These can be as lenient or as strict as you like.
