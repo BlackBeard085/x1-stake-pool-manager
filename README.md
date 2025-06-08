@@ -31,7 +31,7 @@ On the opening dash, select Option 7, Connect Pool, to set up your SPL Stake Poo
    Please enter Funding authority keypair path:
    Please enter Deposit authority keypair path:
    Enter your preferred spl-stake-pool command:
-   bash
+   '''
 
 Once Connected, the pool details will show upon the dashboard.
 ## (pic placeholder)
