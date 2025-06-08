@@ -8,5 +8,10 @@ clone the Stake Pool manager and open the directory
 
 ```bash
    git clone https://github.com/BlackBeard085/x1-stake-pool-manager.git
-cd x1-stake-pool-manager
+   cd x1-stake-pool-manager
    ```
+Start the Pool Manager
+```bash
+   ./x1poolmanager.sh
+   ```
+
