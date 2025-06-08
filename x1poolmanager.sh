@@ -34,7 +34,7 @@ while true; do
         3)
             echo "Staking to Pool Validators..."
             # Add your staking logic here
-            ./start_validator.sh 
+            ./stake_validator.sh 
             ;;
         4)
             echo "Unstaking and Removing all Validators from the Pool..."
