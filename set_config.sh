@@ -46,29 +46,42 @@ prompt() {
   done
 }
 
-# Prompts
-skip_rate=$(prompt "To set Stake Pool skip rate limit, enter a percentage (e.g., 10 for 10%) or '-': " '^[0-9]+(\.[0-9]+)?$' 0 100)
-commission_limit=$(prompt "What is the commission limit? (0-100) or '-': " '^[0-9]+(\.[0-9]+)?$' 0 100)
-credit_limit=$(prompt "Please set the stake pool last epoch credit limit (0 - 8000) or '-': " '^[0-9]+$' 0 8000)
-latency=$(prompt "Please enter the latency (numeric value) or '-': " '^[0-9]+(\.[0-9]+)?$' '' '')
-avg_credits=$(prompt "Please enter the average credits (0 - 8000) or '-': " '^[0-9]+$' 0 8000)
+# Collect inputs
+echo -e "\nEnter a value for each parameter or '-' to skip \n"
+skip_rate=$(prompt "Enter Stake Pool skip rate limit (e.g., 10 for 10%): " '^[0-9]+(\.[0-9]+)?$' 0 100)
+commission_limit=$(prompt "What is the commission limit? (0-100): " '^[0-9]+(\.[0-9]+)?$' 0 100)
+credit_limit=$(prompt "Please set the stake pool last epoch credit limit (0 - 8000): " '^[0-9]+$' 0 8000)
+latency=$(prompt "Please enter the latency (numeric value): " '^[0-9]+(\.[0-9]+)?$' '' '')
+avg_credits=$(prompt "Please enter the average credits (0 - 8000): " '^[0-9]+$' 0 8000)
 reserve=$(prompt "What is the minimum amount of XNT you wish to keep in the reserve? " '^[0-9]+(\.[0-9]+)?$' '' '')
 delegate=$(prompt "How much would you like to delegate to each validator? " '^[0-9]+(\.[0-9]+)?$' '' '')
 
-# Min and max active stake
-min_active_stake=$(prompt "Minimum active stake (or '-' to exclude): " '^[0-9]+(\.[0-9]+)?$' '' '')
-max_active_stake=$(prompt "Maximum active stake (or '-' to exclude): " '^[0-9]+(\.[0-9]+)?' '' '')
+min_active_stake=$(prompt "Minimum active stake: " '^[0-9]+(\.[0-9]+)?$' '' '')
+max_active_stake=$(prompt "Maximum active stake: " '^[0-9]+(\.[0-9]+)?' '' '')
 
-# Update config.json
-jq --argjson rate "$skip_rate" '.skiprate = $rate' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-jq --argjson credit "$credit_limit" '.last_epoch_credit_limit = $credit' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-jq --argjson lat "$latency" '.latency = $lat' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-jq --argjson avg "$avg_credits" '.average_credits = $avg' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-jq --argjson reserve "$reserve" '.reserve = $reserve' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-jq --argjson delegate "$delegate" '.delegate = $delegate' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-jq --argjson commission "$commission_limit" '.commission = $commission' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-jq --argjson minStake "$min_active_stake" '.min_active_stake = $minStake' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-jq --argjson maxStake "$max_active_stake" '.max_active_stake = $maxStake' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+# Function to update JSON with either number or string
+update_json() {
+  local key="$1"
+  local value="$2"
+  if [ "$value" == "-" ]; then
+    # Update with string "-"
+    jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+  else
+    # Update with numeric value
+    jq --arg key "$key" --argjson value "$value" '.[$key] = $value' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+  fi
+}
+
+# Update config.json with each parameter
+update_json "skiprate" "$skip_rate"
+update_json "last_epoch_credit_limit" "$credit_limit"
+update_json "latency" "$latency"
+update_json "average_credits" "$avg_credits"
+update_json "reserve" "$reserve"
+update_json "delegate" "$delegate"
+update_json "commission" "$commission_limit"
+update_json "min_active_stake" "$min_active_stake"
+update_json "max_active_stake" "$max_active_stake"
 
 # Set status to "current"
 jq '.status = "current"' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"

@@ -41,6 +41,7 @@ while true; do
         4)
             echo "Unstaking and Removing all Validators from the Pool..."
             # Add your unstaking logic here
+            cp pool_validators.csv pool_validators.csv.bak
             ./remove_all_validators.sh
             ./update.sh 
             > pool_validators.csv

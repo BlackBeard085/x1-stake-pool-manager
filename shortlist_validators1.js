@@ -40,7 +40,7 @@ function isValidatorEligible(validator, chainSlot, config) {
   const lastVote = parseInt(validator['Last Vote'], 10);
   const secondEpochCredits = parseInt(validator['Second Epoch Credits'].replace(/\D/g, ''), 10);
   const totalCredits = parseInt(validator['Total Credits'].replace(/\D/g, ''), 10);
-  const averageCredits = parseFloat(validator['Average Credits'].replace(/[^0-9.]/g, '')); // Changed to parseFloat
+  const averageCredits = parseFloat(validator['Average Credits'].replace(/[^0-9.]/g, '')); // Allow decimals
   const skipRateStr = validator['Skip Rate'].trim();
   const skipRate = skipRateStr.toLowerCase() === 'n/a' ? null : parseFloat(skipRateStr.replace('%', '').trim());
   const latency = parseFloat(validator['Latency']);
@@ -76,26 +76,35 @@ function isValidatorEligible(validator, chainSlot, config) {
     return false;
   }
 
-  // Check skip rate <= config.skiprate
-  if (!isExcluded(config.skiprate) && skipRate !== null && (isNaN(skipRate) || skipRate > config.skiprate)) {
+  // Check skip rate
+  if (!isExcluded(config.skiprate) && skipRate !== null && (isNaN(skipRate) || skipRate >= config.skiprate)) {
     return false;
   }
 
-  // Check commission <= config.commission
+  // Check commission
   if (!isExcluded(config.commission) && (isNaN(commission) || commission > config.commission)) {
     return false;
   }
 
-  // Check active stake against min and max (converted to XNT)
-  if (!isExcluded(config.min_active_stake)) {
-    const minStake = parseFloat(config.min_active_stake);
-    if (isNaN(minStake) || activatedStake < minStake) {
+  // Check active stake against min and max, considering '-' (ignore if so)
+  const minStakeConfig = isExcluded(config.min_active_stake) ? null : parseFloat(config.min_active_stake);
+  const maxStakeConfig = isExcluded(config.max_active_stake) ? null : parseFloat(config.max_active_stake);
+
+  // Only proceed if both min and max are defined
+  if (minStakeConfig !== null && maxStakeConfig !== null) {
+    if (activatedStake < minStakeConfig || activatedStake > maxStakeConfig) {
       return false;
     }
   }
-  if (!isExcluded(config.max_active_stake)) {
-    const maxStake = parseFloat(config.max_active_stake);
-    if (isNaN(maxStake) || activatedStake > maxStake) {
+  // If only min is defined
+  else if (minStakeConfig !== null && maxStakeConfig === null) {
+    if (activatedStake < minStakeConfig) {
+      return false;
+    }
+  }
+  // If only max is defined
+  else if (minStakeConfig === null && maxStakeConfig !== null) {
+    if (activatedStake > maxStakeConfig) {
       return false;
     }
   }
