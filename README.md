@@ -36,7 +36,7 @@ On the opening dash, select Option 7, Connect Pool, to set up your SPL Stake Poo
 Once Connected, the pool details will show upon the dashboard.
 ## (pic placeholder)
 
-## Setting up Shortlist Parameters
+## Setting up Stake Pool and Shortlist Parameters
 Select Option 6 to set the parameters of the pool and condtions the validators must meet to be shortlisted.
 These can be as lenient or as strict as you like. To exclude a parameter from vetting enter '-'
 
@@ -52,4 +52,10 @@ These can be as lenient or as strict as you like. To exclude a parameter from ve
    What is the minimum amount of XNT you wish to keep in the reserve? 
    How much would you like to delegate to each validator? 
    ```
+
+## Fund the Stake Pool
+You must fund the Stake Pool before adding validators. Fund the pool using option 3. Enter the total amount of funds you wish to be managed by the pool manager.
+
+## Update Pool validators
+
 
