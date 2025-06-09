@@ -50,14 +50,16 @@ prompt() {
 echo -e "\nEnter a value for each parameter or '-' to exclude the metric from vetting \n"
 skip_rate=$(prompt "Enter the maximum skip rate a validator can have (e.g., 10 for 10%): " '^[0-9]+(\.[0-9]+)?$' 0 100)
 commission_limit=$(prompt "Enter the maximum commission the validator can charge: " '^[0-9]+(\.[0-9]+)?$' 0 100)
+min_active_stake=$(prompt "Enter the minimum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
+max_active_stake=$(prompt "Enter the maximum active stake requirment: " '^[0-9]+(\.[0-9]+)?' '' '')
 credit_limit=$(prompt "Enter the last full epoch credit requirement (0 - 8000): " '^[0-9]+$' 0 8000)
 latency=$(prompt "Please enter the minimum latency requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
 avg_credits=$(prompt "Please enter the Validator average credits requirment (0 - 8000): " '^[0-9]+$' 0 8000)
 reserve=$(prompt "What is the minimum amount of XNT you wish to keep in the reserve? " '^[0-9]+(\.[0-9]+)?$' '' '')
 delegate=$(prompt "How much would you like to delegate to each validator? " '^[0-9]+(\.[0-9]+)?$' '' '')
 
-min_active_stake=$(prompt "Enter the minimum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
-max_active_stake=$(prompt "Enter the maximum active stake requirment: " '^[0-9]+(\.[0-9]+)?' '' '')
+#min_active_stake=$(prompt "Enter the minimum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
+#max_active_stake=$(prompt "Enter the maximum active stake requirment: " '^[0-9]+(\.[0-9]+)?' '' '')
 
 # Function to update JSON with either number or string
 update_json() {
@@ -75,13 +77,15 @@ update_json() {
 # Update config.json with each parameter
 update_json "skiprate" "$skip_rate"
 update_json "last_epoch_credit_limit" "$credit_limit"
+update_json "min_active_stake" "$min_active_stake"
+update_json "max_active_stake" "$max_active_stake"
 update_json "latency" "$latency"
 update_json "average_credits" "$avg_credits"
 update_json "reserve" "$reserve"
 update_json "delegate" "$delegate"
 update_json "commission" "$commission_limit"
-update_json "min_active_stake" "$min_active_stake"
-update_json "max_active_stake" "$max_active_stake"
+#update_json "min_active_stake" "$min_active_stake"
+#update_json "max_active_stake" "$max_active_stake"
 
 # Set status to "current"
 jq '.status = "current"' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
@@ -90,11 +94,13 @@ jq '.status = "current"' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_F
 echo "Configuration updated successfully:"
 echo " - Skip rate limit: $skip_rate%"
 echo " - Commission limit: $commission_limit"
+echo " - Min active stake: $min_active_stake"
+echo " - Max active stake: $max_active_stake"
 echo " - Last epoch credit limit: $credit_limit"
 echo " - Latency: $latency"
 echo " - Average credits: $avg_credits"
 echo " - Minimum reserve (XNT): $reserve"
 echo " - Delegation per validator: $delegate"
-echo " - Min active stake: $min_active_stake"
-echo " - Max active stake: $max_active_stake"
+#echo " - Min active stake: $min_active_stake"
+#echo " - Max active stake: $max_active_stake"
 echo " - Status: current"
