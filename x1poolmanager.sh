@@ -41,7 +41,19 @@ while true; do
         4)
             echo "Unstaking and Removing all Validators from the Pool..."
             # Add your unstaking logic here
-            cp pool_validators.csv pool_validators.csv.bak
+            #cp pool_validators.csv pool_validators.csv.bak
+            if [ -e pool_validators.csv.bak ]; then
+              read -p "Backup file 'pool_validators.csv.bak' already exists. Overwrite? (y/n): " answer
+              if [[ "$answer" =~ ^[Yy]$ ]]; then
+                  cp pool_validators.csv pool_validators.csv.bak
+                  echo "File overwritten."
+               else
+                  echo "Operation canceled. Backup not overwritten."
+                  fi
+               else
+                  cp pool_validators.csv pool_validators.csv.bak
+                  echo "Backup created."
+               fi
             ./remove_all_validators.sh
             ./update.sh 
             > pool_validators.csv
