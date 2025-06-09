@@ -16,7 +16,7 @@ Start the Pool Manager
    ```
 
 Opening Dash
-## (pic placeholder)
+![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/NoPoolConnected.jpg)
 
 A notification on dash will prompt user to connect a pool to the manager.
 
@@ -33,8 +33,9 @@ On the opening dash, select Option 7, Connect Pool, to set up your SPL Stake Poo
    Enter your preferred spl-stake-pool command:
    ```
 
-Once Connected, the pool details will show upon the dashboard.
-## (pic placeholder)
+Once Connected, the pool details will show upon the dashboard. This image shows validators also shortlisted.
+
+![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/StakePoolManagerMenu.jpg)
 
 ## Setting up Stake Pool and Shortlist Parameters
 Select Option 6 to set the parameters of the pool and condtions the validators must meet to be shortlisted.
@@ -60,7 +61,8 @@ You must fund the Stake Pool before adding validators. Fund the pool using optio
 ## Update Pool Validators
 Select Option 2 to automatically check all current validators on chain, their performance metrics and vett them against pool requirments to create a shortlist of validators and include qualifying Validators into the pool. examine the following flow chart how this works.
 
-## (pic placeholder)
+
+![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/StakepoolManagerFlowchart.jpg)
 
 ## Stake to Pool Validators
 Once the program has selected the qualifying validators, select option 3 to stake to all validators the amount specified in the configuration setup. All validators will be staked by this amount.
