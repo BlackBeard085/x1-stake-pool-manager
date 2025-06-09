@@ -37,5 +37,19 @@ Once Connected, the pool details will show upon the dashboard.
 ## (pic placeholder)
 
 ## Setting up Shortlist Parameters
-Select Option 6 to set the parameters the validators will be vetted againat to be shortlisted.
-These can be as lenient or as strict as you like.
+Select Option 6 to set the parameters of the pool and condtions the validators must meet to be shortlisted.
+These can be as lenient or as strict as you like. To exclude a parameter from vetting enter '-'
+
+```bash
+   Enter a value for each parameter or '-' to exclude the metric from vetting
+   Enter the maximum skip rate a validator can have (e.g., 10 for 10%): 
+   Enter the maximum commission the validator can charge: 
+   Enter the minimum active stake requirement: 
+   Enter the maximum active stake requirment: 
+   Enter the last full epoch credit requirement (0 - 8000): 
+   Please enter the minimum latency requirement: 
+   Please enter the Validator average credits requirment (0 - 8000): 
+   What is the minimum amount of XNT you wish to keep in the reserve? 
+   How much would you like to delegate to each validator? 
+   ```
+
