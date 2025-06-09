@@ -47,17 +47,17 @@ prompt() {
 }
 
 # Collect inputs
-echo -e "\nEnter a value for each parameter or '-' to skip \n"
-skip_rate=$(prompt "Enter Stake Pool skip rate limit (e.g., 10 for 10%): " '^[0-9]+(\.[0-9]+)?$' 0 100)
-commission_limit=$(prompt "What is the commission limit? (0-100): " '^[0-9]+(\.[0-9]+)?$' 0 100)
-credit_limit=$(prompt "Please set the stake pool last epoch credit limit (0 - 8000): " '^[0-9]+$' 0 8000)
-latency=$(prompt "Please enter the latency (numeric value): " '^[0-9]+(\.[0-9]+)?$' '' '')
-avg_credits=$(prompt "Please enter the average credits (0 - 8000): " '^[0-9]+$' 0 8000)
+echo -e "\nEnter a value for each parameter or '-' to exclude the metric from vetting \n"
+skip_rate=$(prompt "Enter the maximum skip rate a validator can have (e.g., 10 for 10%): " '^[0-9]+(\.[0-9]+)?$' 0 100)
+commission_limit=$(prompt "Enter the maximum commission the validator can charge: " '^[0-9]+(\.[0-9]+)?$' 0 100)
+credit_limit=$(prompt "Enter the last full epoch credit requirement (0 - 8000): " '^[0-9]+$' 0 8000)
+latency=$(prompt "Please enter the minimum latency requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
+avg_credits=$(prompt "Please enter the Validator average credits requirment (0 - 8000): " '^[0-9]+$' 0 8000)
 reserve=$(prompt "What is the minimum amount of XNT you wish to keep in the reserve? " '^[0-9]+(\.[0-9]+)?$' '' '')
 delegate=$(prompt "How much would you like to delegate to each validator? " '^[0-9]+(\.[0-9]+)?$' '' '')
 
-min_active_stake=$(prompt "Minimum active stake: " '^[0-9]+(\.[0-9]+)?$' '' '')
-max_active_stake=$(prompt "Maximum active stake: " '^[0-9]+(\.[0-9]+)?' '' '')
+min_active_stake=$(prompt "Enter the minimum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
+max_active_stake=$(prompt "Enter the maximum active stake requirment: " '^[0-9]+(\.[0-9]+)?' '' '')
 
 # Function to update JSON with either number or string
 update_json() {
