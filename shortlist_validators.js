@@ -29,9 +29,14 @@ const csvWriter = createObjectCsvWriter({
 
 const shortlistedValidators = [];
 
+// Helper function to check if a config parameter is set to exclude
+function isExcluded(param) {
+  return param === "-";
+}
+
 // Function to check if validator meets criteria
 function isValidatorEligible(validator, chainSlot, config) {
-  // Parse numerical values, removing any non-numeric characters if needed
+  // Parse numerical values
   const lastVote = parseInt(validator['Last Vote'], 10);
   const secondEpochCredits = parseInt(validator['Second Epoch Credits'].replace(/\D/g, ''), 10);
   const totalCredits = parseInt(validator['Total Credits'].replace(/\D/g, ''), 10);
@@ -42,39 +47,57 @@ function isValidatorEligible(validator, chainSlot, config) {
   const commission = parseFloat(validator['Commission']);
   const status = validator['Status'].toLowerCase();
 
+  // Convert activated stake from validator to XNT
+  const activatedStakeRaw = validator['Activated Stake'];
+  const activatedStake = parseFloat(activatedStakeRaw) / 1_000_000_000; // convert to XNT
+
   // Check status
-  if (status !== config.status.toLowerCase()) {
+  if (!isExcluded(config.status) && status !== config.status.toLowerCase()) {
     return false;
   }
 
   // Check last vote within 100 of chainSlot
-  if (isNaN(lastVote) || Math.abs(chainSlot - lastVote) > 100) {
+  if (!isExcluded(config.chainSlot) && (isNaN(lastVote) || Math.abs(chainSlot - lastVote) > 100)) {
     return false;
   }
 
   // Check second epoch credits >= last_epoch_credit_limit
-  if (isNaN(secondEpochCredits) || secondEpochCredits < config.last_epoch_credit_limit) {
+  if (!isExcluded(config.last_epoch_credit_limit) && (isNaN(secondEpochCredits) || secondEpochCredits < config.last_epoch_credit_limit)) {
     return false;
   }
 
   // Check average credits >= average_credits
-  if (isNaN(averageCredits) || averageCredits < config.average_credits) {
+  if (!isExcluded(config.average_credits) && (isNaN(averageCredits) || averageCredits < config.average_credits)) {
     return false;
   }
 
   // Check latency <= config.latency
-  if (isNaN(latency) || latency > config.latency) {
+  if (!isExcluded(config.latency) && (isNaN(latency) || latency > config.latency)) {
     return false;
   }
 
-  // Check skip rate: if it's not "N/A" and >= config.skiprate, reject
-  if (skipRate !== null && (isNaN(skipRate) || skipRate >= config.skiprate)) {
+  // Check skip rate
+  if (!isExcluded(config.skiprate) && skipRate !== null && (isNaN(skipRate) || skipRate >= config.skiprate)) {
     return false;
   }
 
-  // Check commission <= config.commission
-  if (isNaN(commission) || commission > config.commission) {
+  // Check commission
+  if (!isExcluded(config.commission) && (isNaN(commission) || commission > config.commission)) {
     return false;
+  }
+
+  // Check active stake against min and max (converted to XNT)
+  if (!isExcluded(config.min_active_stake)) {
+    const minStake = parseFloat(config.min_active_stake);
+    if (isNaN(minStake) || activatedStake < minStake) {
+      return false;
+    }
+  }
+  if (!isExcluded(config.max_active_stake)) {
+    const maxStake = parseFloat(config.max_active_stake);
+    if (isNaN(maxStake) || activatedStake > maxStake) {
+      return false;
+    }
   }
 
   return true;

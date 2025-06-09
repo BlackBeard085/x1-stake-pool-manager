@@ -29,6 +29,11 @@ const csvWriter = createObjectCsvWriter({
 
 const shortlistedValidators = [];
 
+// Helper function to check if a config parameter is set to exclude
+function isExcluded(param) {
+  return param === "-";
+}
+
 // Function to check if validator meets criteria
 function isValidatorEligible(validator, chainSlot, config) {
   // Parse numerical values, removing any non-numeric characters if needed
@@ -43,37 +48,37 @@ function isValidatorEligible(validator, chainSlot, config) {
   const status = validator['Status'].toLowerCase();
 
   // Check status
-  if (status !== config.status.toLowerCase()) {
+  if (!isExcluded(config.status) && status !== config.status.toLowerCase()) {
     return false;
   }
 
-  // Check last vote within 5 of chainSlot
-  if (isNaN(lastVote) || Math.abs(chainSlot - lastVote) > 5) {
+  // Check last vote within 100 of chainSlot
+  if (!isExcluded(config.chainSlot) && (isNaN(lastVote) || Math.abs(chainSlot - lastVote) > 100)) {
     return false;
   }
 
-  // Check second epoch credits > last_epoch_credit_limit
-  if (isNaN(secondEpochCredits) || secondEpochCredits <= config.last_epoch_credit_limit) {
+  // Check second epoch credits >= last_epoch_credit_limit
+  if (!isExcluded(config.last_epoch_credit_limit) && (isNaN(secondEpochCredits) || secondEpochCredits < config.last_epoch_credit_limit)) {
     return false;
   }
 
-  // Check average credits > average_credits
-  if (isNaN(averageCredits) || averageCredits <= config.average_credits) {
+  // Check average credits >= average_credits
+  if (!isExcluded(config.average_credits) && (isNaN(averageCredits) || averageCredits < config.average_credits)) {
     return false;
   }
 
   // Check latency <= config.latency
-  if (isNaN(latency) || latency > config.latency) {
+  if (!isExcluded(config.latency) && (isNaN(latency) || latency > config.latency)) {
     return false;
   }
 
-  // Check skip rate: if it's not "N/A" and >= config.skiprate, reject
-  if (skipRate !== null && (isNaN(skipRate) || skipRate >= config.skiprate)) {
+  // Check skip rate: if it's not "N/A" and not excluded and >= config.skiprate, reject
+  if (!isExcluded(config.skiprate) && skipRate !== null && (isNaN(skipRate) || skipRate >= config.skiprate)) {
     return false;
   }
 
   // Check commission <= config.commission
-  if (isNaN(commission) || commission > config.commission) {
+  if (!isExcluded(config.commission) && (isNaN(commission) || commission > config.commission)) {
     return false;
   }
 

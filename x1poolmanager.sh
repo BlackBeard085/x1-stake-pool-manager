@@ -42,6 +42,9 @@ while true; do
             echo "Unstaking and Removing all Validators from the Pool..."
             # Add your unstaking logic here
             ./remove_all_validators.sh
+            ./update.sh 
+            > pool_validators.csv
+            > staking_shortlist.csv
             ;;
         5)
             echo "Withdrawing from Pool..."
