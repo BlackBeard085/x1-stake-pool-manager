@@ -66,6 +66,11 @@ function isValidatorEligible(validator, chainSlot, config) {
     return false;
   }
 
+  // Check total credits >= total_credits requirement
+  if (!isExcluded(config.total_credits) && (isNaN(totalCredits) || totalCredits < config.total_credits)) {
+    return false;
+  }
+
   // Check average credits >= average_credits
   if (!isExcluded(config.average_credits) && (isNaN(averageCredits) || averageCredits < config.average_credits)) {
     return false;

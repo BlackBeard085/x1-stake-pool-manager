@@ -2,115 +2,105 @@
 
 CONFIG_FILE="config.json"
 
-# Check if config.json exists; if not, create an empty JSON object
+# Initialize config.json if missing
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "{}" > "$CONFIG_FILE"
 fi
 
-# Check if jq is installed
+# Check jq
 if ! command -v jq &> /dev/null; then
-  echo "Error: jq is required but not installed. Please install jq and rerun the script."
+  echo "Error: jq is required but not installed."
   exit 1
 fi
 
-# Function to process user input
-# Returns "-" if user inputs "-", otherwise returns the validated input
-get_input() {
-  local prompt="$1"
+# Function to prompt with validation
+prompt() {
+  local prompt_text="$1"
   local pattern="$2"
   local min="$3"
   local max="$4"
-
-  read -p "$prompt" input
-  if [ "$input" == "-" ]; then
-    echo "-"
-    return
-  fi
-
-  # Validate input based on pattern
-  if ! [[ "$input" =~ $pattern ]]; then
-    echo "Invalid input. Please enter a valid number or '-' to exclude."
-    get_input "$prompt" "$pattern" "$min" "$max"
-    return
-  fi
-
-  # For numeric inputs, check range if min and max are provided
-  if [ -n "$min" ] && [ -n "$max" ]; then
-    # Use bc for comparison if input is float
-    if ! [[ "$input" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-      echo "Invalid input. Please enter a numeric value."
-      get_input "$prompt" "$pattern" "$min" "$max"
+  local input
+  while true; do
+    read -p "$prompt_text" input
+    if [ "$input" == "-" ]; then
+      echo "-"
       return
     fi
-    if (( $(echo "$input < $min" | bc -l) )) || (( $(echo "$input > $max" | bc -l) )); then
-      echo "Input out of range ($min - $max). Please try again."
-      get_input "$prompt" "$pattern" "$min" "$max"
-      return
+    if [[ "$input" =~ $pattern ]]; then
+      # Range check if applicable
+      if [ -n "$min" ] && [ -n "$max" ]; then
+        if ! [[ "$input" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+          echo "Invalid numeric input."
+          continue
+        fi
+        if (( $(echo "$input < $min" | bc -l) )) || (( $(echo "$input > $max" | bc -l) )); then
+          echo "Input out of range ($min - $max)."
+          continue
+        fi
+      fi
+      echo "$input"
+      break
+    else
+      echo "Invalid input format."
     fi
-  fi
-
-  echo "$input"
+  done
 }
 
-# Prompt for skip rate percentage
-skip_rate=$(get_input "To set Stake Pool skip rate limit, enter a percentage (e.g., 10 for 10% or '-' to exclude): " '^[0-9]+(\.[0-9]+)?$' 0 100)
+# Collect inputs
+echo -e "\nEnter a value for each parameter or '-' to exclude the metric from vetting \n"
+skip_rate=$(prompt "Enter the maximum skip rate a validator can have (e.g., 10 for 10%): " '^[0-9]+(\.[0-9]+)?$' 0 100)
+commission_limit=$(prompt "Enter the maximum commission the validator can charge: " '^[0-9]+(\.[0-9]+)?$' 0 100)
+min_active_stake=$(prompt "Enter the minimum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
+max_active_stake=$(prompt "Enter the maximum active stake requirment: " '^[0-9]+(\.[0-9]+)?' '' '')
+credit_limit=$(prompt "Enter the last full epoch credit requirement (0 - 8000): " '^[0-9]+$' 0 8000)
+latency=$(prompt "Please enter the minimum latency requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
+avg_credits=$(prompt "Please enter the Validator average credits requirment (0 - 8000): " '^[0-9]+$' 0 8000)
+reserve=$(prompt "What is the minimum amount of XNT you wish to keep in the reserve? " '^[0-9]+(\.[0-9]+)?$' '' '')
+delegate=$(prompt "How much would you like to delegate to each validator? " '^[0-9]+(\.[0-9]+)?$' '' '')
 
-# Prompt for commission limit (0-100)
-commission_limit=$(get_input "What is the commission limit? (0-100 or '-' to exclude): " '^[0-9]+(\.[0-9]+)?$' 0 100)
+#min_active_stake=$(prompt "Enter the minimum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
+#max_active_stake=$(prompt "Enter the maximum active stake requirment: " '^[0-9]+(\.[0-9]+)?' '' '')
 
-# Prompt for last epoch credit limit
-credit_limit=$(get_input "Please set the stake pool last epoch credit limit (0 - 8000 or '-' to exclude): " '^[0-9]+$' 0 8000)
-
-# Prompt for latency
-latency=$(get_input "Please enter the latency (numeric value or '-' to exclude): " '^[0-9]+(\.[0-9]+)?$' '' '')
-
-# Prompt for average credits
-avg_credits=$(get_input "Please enter the average credits (0 - 8000 or '-' to exclude): " '^[0-9]+$' 0 8000)
-
-# Prompt for minimum amount of XNT to keep in reserve
-reserve=$(get_input "What is the minimum amount of XNT you wish to keep in the reserve? " '^[0-9]+(\.[0-9]+)?$' '' '')
-
-# Prompt for delegation amount per validator
-delegate=$(get_input "How much would you like to delegate to each validator? " '^[0-9]+(\.[0-9]+)?$' '' '')
-
-# Function to update JSON with value or "-"
+# Function to update JSON with either number or string
 update_json() {
   local key="$1"
   local value="$2"
   if [ "$value" == "-" ]; then
-    jq --arg val "-" ".${key} = \$val" "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+    # Update with string "-"
+    jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
   else
-    # Determine if value is float or int for json
-    if [[ "$value" =~ ^[0-9]+\.[0-9]+$ ]]; then
-      jq --argjson val "$value" ".${key} = \$val" "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-    elif [[ "$value" =~ ^[0-9]+$ ]]; then
-      jq --argjson val "$value" ".${key} = \$val" "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-    else
-      # fallback to string if needed
-      jq --arg val "$value" ".${key} = \$val" "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
-    fi
+    # Update with numeric value
+    jq --arg key "$key" --argjson value "$value" '.[$key] = $value' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
   fi
 }
 
-# Update parameters in config.json
+# Update config.json with each parameter
 update_json "skiprate" "$skip_rate"
 update_json "last_epoch_credit_limit" "$credit_limit"
+update_json "min_active_stake" "$min_active_stake"
+update_json "max_active_stake" "$max_active_stake"
 update_json "latency" "$latency"
 update_json "average_credits" "$avg_credits"
 update_json "reserve" "$reserve"
 update_json "delegate" "$delegate"
 update_json "commission" "$commission_limit"
+#update_json "min_active_stake" "$min_active_stake"
+#update_json "max_active_stake" "$max_active_stake"
 
 # Set status to "current"
 jq '.status = "current"' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
 
-# Final confirmation
+# Final message
 echo "Configuration updated successfully:"
-echo " - Skip rate limit: $skip_rate"
+echo " - Skip rate limit: $skip_rate%"
 echo " - Commission limit: $commission_limit"
+echo " - Min active stake: $min_active_stake"
+echo " - Max active stake: $max_active_stake"
 echo " - Last epoch credit limit: $credit_limit"
 echo " - Latency: $latency"
 echo " - Average credits: $avg_credits"
 echo " - Minimum reserve (XNT): $reserve"
 echo " - Delegation per validator: $delegate"
+#echo " - Min active stake: $min_active_stake"
+#echo " - Max active stake: $max_active_stake"
 echo " - Status: current"
