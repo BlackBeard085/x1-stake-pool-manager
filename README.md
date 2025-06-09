@@ -56,6 +56,21 @@ These can be as lenient or as strict as you like. To exclude a parameter from ve
 ## Fund the Stake Pool
 You must fund the Stake Pool before adding validators. Fund the pool using option 3. Enter the total amount of funds you wish to be managed by the pool manager.
 
-## Update Pool validators
+## Update Pool Validators
+Select Option 2 to automatically check all current validators on chain, their performance metrics and vett them against pool requirments to create a shortlist of validators and include qualifying Validators into the pool. examine the following flow chart how this works.
+
+## (pic placeholder)
+
+## Stake to Pool Validators
+Once the program has selected the qualifying validators, select option 3 to stake to all validators the amount specified in the configuration setup. All validators will be staked by this amount.
+
+***Function to be added - all validators will be staked by the requested amount and maintaining a minimum balance within the stake pool. if the minimum balance drops below the minimum amount set, the manager will prompt you to change the staking amount to maintain a minimum reserve balance.
+
+## Remove all Validators
+option 4 will create a backup of the current validators in the stake pool and attempt to remove all validators within the pool before clearing the poll validator list and shortlist.
+
+
+
+
 
 
