@@ -42,13 +42,14 @@ These can be as lenient or as strict as you like. To exclude a parameter from ve
 
 ```bash
    Enter a value for each parameter or '-' to exclude the metric from vetting
-   Enter the maximum skip rate a validator can have (e.g., 10 for 10%): 
-   Enter the maximum commission the validator can charge: 
-   Enter the minimum active stake requirement: 
-   Enter the maximum active stake requirment: 
-   Enter the last full epoch credit requirement (0 - 8000): 
-   Please enter the minimum latency requirement: 
-   Please enter the Validator average credits requirment (0 - 8000): 
+   Enter the maximum skip rate a validator can have (10 for 10%):  #higher skip rates will be excluded from the pool
+   Enter the maximum commission the validator can charge:          #higher commisions will be excluded from the pool
+   Enter the minimum active stake requirement:                     #lower stake will be excluded from the pool
+   Enter the maximum active stake requirment:                      #higher stake will be excluded from the pool
+   Enter the last full epoch credit requirement (0 - 8000):        #lower credits earned will be excluded
+   What is the minimum Total Credits requirement:                  #total credits will enforce minimum uptime requirement
+   Please enter the minimum latency requirement:                      #higher latency will be excluded
+   Please enter the Validator average credits requirment (0 - 8000):  #lower average credits will be excluded.
    What is the minimum amount of XNT you wish to keep in the reserve? 
    How much would you like to delegate to each validator? 
    ```
