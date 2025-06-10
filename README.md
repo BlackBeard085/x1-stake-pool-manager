@@ -38,7 +38,7 @@ Once Connected, the pool details will show upon the dashboard. This image shows 
 ![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/StakePoolManagerMenu.jpg)
 
 ## Setting up Stake Pool and Shortlist Parameters
-Select Option 6 to set the parameters of the pool and condtions the validators must meet to be shortlisted.
+Select Option 6 or edit the config.json to set the parameters of the pool and condtions the validators must meet to be shortlisted.
 These can be as lenient or as strict as you like. To exclude a parameter from vetting enter '-'
 
 ```bash
