@@ -1,4 +1,9 @@
-# X1 Stake Pool Manager
+**Disclaimer - Please read all relevant documents and carry out any necessary due diligence before using X1 Console. By using X1 Console, you acknowledge that you have read the documentation and understand the risks associated with cryptocurrency and related products. You agree that the creator of X1 Console is not liable for any damages or losses that may arise from your use of this product. Use at your own risk.**
+
+# X1 Stake Pool Manager - Jack The Ripper
+Welcome to X1's stake Pool Manager - Jack The Ripper, an interactive, automated tool designed for managing and vetting validators within an X1 stake pool. Created by BlackBeard, it simplifies the process of setting up, connecting, and maintaining stake pools by providing features such as validator vetting based on customizable parameters, staking, fund management, and validator removal. It ensures only validators with the best performance are delgated to.
+
+![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/JackTheRipper.jpg)
 
 ## Requirements
 You will need to create a stake pool using the SPL Stake Pool program and have access to the generated keys for the stake pool.
