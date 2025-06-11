@@ -27,7 +27,7 @@ A notification on dash will prompt user to connect a pool to the manager.
 
 ## Connecting a SPL Stake Pool
 
-On the opening dash, select Option 7, Connect Pool, to set up your SPL Stake Pool with the stake pool manager. you will asked to input the keypair paths to the SOL Stake Pool generated accounts and also the path to the spl-stake-pool binary or command prompt. 
+On the opening dash, select Option 7, Connect Pool, to set up your SPL Stake Pool with the stake pool manager. You will asked to input the keypair paths to the SPL Stake Pool generated accounts and also the path to the spl-stake-pool binary or command prompt. 
 
 ```bash
    Please enter X1 Stake Pool keypair:
