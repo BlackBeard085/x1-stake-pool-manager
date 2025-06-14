@@ -85,7 +85,7 @@ option 6 or manual command
 ```bash
    ./update.sh
    ```
-to update pool data. Once validators are added or removed from the pool, it may need updating to show the mose upto date number of validators or reserve balance in the reserve. Usually required on the following Epoch after removing validators from the pool.
+to update pool data. Once validators are added or removed from the pool, it may need updating to show the more upto date number of validators or reserve balance. Usually required on the following Epoch after removing validators from the pool.
 
 
 
