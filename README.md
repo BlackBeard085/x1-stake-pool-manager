@@ -78,7 +78,7 @@ Once the program has selected the qualifying validators, select option 3 to stak
 Option 4 will create a backup of the current validators in the stake pool and attempt to remove all validators within the pool before clearing the poll validator list and shortlist.
 
 ## Withdraw Unstaked Reserve Funds
-Option 5, widraw any amount that is not staked to Validators.
+Option 5, withdraw any amount that is not staked to Validators.
 
 ## Update Pool data
 option 6 or manual command
