@@ -15,9 +15,10 @@ while true; do
     echo "3. Stake to Pool Validators"
     echo "4. Unstake All Validators"
     echo "5. Withdraw from Pool"
-    echo "6. Set Parameters"
-    echo "7. Connect Pool"
-    read -p "Enter your choice (1-7): " choice
+    echo "6. Update Pool"
+    echo "7. Set Parameters"
+    echo "8. Connect Pool"
+    read -p "Enter your choice (1-8): " choice
     echo
 
     case "$choice" in
@@ -54,7 +55,8 @@ while true; do
                   cp pool_validators.csv pool_validators.csv.bak
                   echo "Backup created."
                fi
-            ./remove_all_validators.sh
+            ./remove_all_validators.sh && ./update.sh
+            sleep 10
             ./update.sh 
             > pool_validators.csv
             > staking_shortlist.csv
@@ -65,11 +67,16 @@ while true; do
             ./withdraw_reserve.sh
             ;;
         6)
+            echo "Updating Pool data..."
+            # Add your update Pool logic here
+            ./update.sh
+            ;;
+        7)
             echo "Setting Parameters..."
             # Add your set parameters logic here
             ./set_config.sh
             ;;
-        7)
+        8)
             echo "Connecting Pool..."
             # Add your connect pool logic here
             ./get_pool_keypairs.sh
