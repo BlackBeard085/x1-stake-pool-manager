@@ -75,9 +75,17 @@ Once the program has selected the qualifying validators, select option 3 to stak
 ***Function to be added - all validators will be staked by the requested amount and maintaining a minimum balance within the stake pool. If the balance drops below the minimum amount set, the manager will prompt you to change the staking amount to maintain a minimum reserve balance.
 
 ## Remove all Validators
-option 4 will create a backup of the current validators in the stake pool and attempt to remove all validators within the pool before clearing the poll validator list and shortlist.
+Option 4 will create a backup of the current validators in the stake pool and attempt to remove all validators within the pool before clearing the poll validator list and shortlist.
 
+## Withdraw Unstaked Reserve Funds
+Option 5, widraw any amount that is not staked to Validators.
 
+## Update Pool data
+option 6 or manual command
+```bash
+   ./update.sh
+   ```
+to update pool data. Once validators are added or removed from the pool, it may need updating to show the mose upto date number of validators or reserve balance in the reserve. Usually required on the following Epoch after removing validators from the pool.
 
 
 
