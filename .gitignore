@@ -7,3 +7,5 @@ add_to_pool.txt
 pool_keypairs.json
 remove-list.txt
 pool_validators.csv.bak
+failed_to_add.log
+failed_to_remove.log
