@@ -7,7 +7,7 @@ const poolKeypairsPath = 'pool_keypairs.json';
 const configPath = 'config.json';
 
 async function main() {
-  console.log("X1 Stake Pool Manager v0.0.2 - By BlackBeard\n");
+  console.log("X1 Stake Pool Manager v0.0.3 - By BlackBeard\n");
 
   // Read config.json to get min reserve and delegate
   let minReserveBalance = null;

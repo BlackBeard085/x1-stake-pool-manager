@@ -13,12 +13,14 @@ while true; do
     echo "1. Fund Pool"
     echo "2. Update Pool Validators"
     echo "3. Stake to Pool Validators"
-    echo "4. Unstake All Validators"
-    echo "5. Withdraw from Pool"
-    echo "6. Update Pool"
-    echo "7. Set Parameters"
-    echo "8. Connect Pool"
-    read -p "Enter your choice (1-8): " choice
+    echo "4. Redistribute Stake"
+    echo "5. Unstake All Validators"
+    echo "6. Withdraw from Pool"
+    echo "7. Update Pool"
+    echo "8. Set Parameters"
+    echo "9. Connect Pool"
+    echo "0. Exit"
+    read -p "Enter your choice (0-9): " choice
     echo
 
     case "$choice" in
@@ -40,6 +42,9 @@ while true; do
             ./update.sh 
             ;;
         4)
+            echo "Redistributing stake"
+            ;;
+        5)
             echo "Unstaking and Removing all Validators from the Pool..."
             # Add your unstaking logic here
             #cp pool_validators.csv pool_validators.csv.bak
@@ -61,25 +66,28 @@ while true; do
             > pool_validators.csv
             > staking_shortlist.csv
             ;;
-        5)
+        6)
             echo "Withdrawing from Pool..."
             # Add your withdrawal logic here
             ./withdraw_reserve.sh
             ;;
-        6)
+        7)
             echo "Updating Pool data..."
             # Add your update Pool logic here
             ./update.sh
             ;;
-        7)
+        8)
             echo "Setting Parameters..."
             # Add your set parameters logic here
             ./set_config.sh
             ;;
-        8)
+        9)
             echo "Connecting Pool..."
             # Add your connect pool logic here
             ./get_pool_keypairs.sh
+            ;;
+        0)
+            exit 0
             ;;
         *)
             echo "Invalid choice. Please try again."
