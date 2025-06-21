@@ -3,7 +3,9 @@
 # Path to your files
 CONFIG_FILE="config.json"
 CSV_FILE="pool_validators.csv"
+ADD_TO_POOL_FILE="add_to_pool.txt"
 KEYPAIRS_FILE="pool_keypairs.json"
+OUTPUT_FILE="redistribute.json"
 
 # Extract 'delegate' value from config.json
 delegate=$(jq -r '.delegate' "$CONFIG_FILE")
@@ -13,14 +15,21 @@ if [ -z "$delegate" ] || [ "$delegate" == "null" ]; then
 fi
 
 # Count entries in CSV excluding header
-entries=$(tail -n +2 "$CSV_FILE" | grep -c .)
-if [ "$entries" -eq 0 ]; then
-    echo "Error: No entries found in $CSV_FILE"
-    exit 1
+entries_total=$(tail -n +2 "$CSV_FILE" | grep -c .)
+
+# Count entries in add_to_pool.txt
+entries_in_add=$(wc -l < "$ADD_TO_POOL_FILE")
+
+# Calculate net entries
+net_entries=$(( entries_total - entries_in_add ))
+
+if [ "$net_entries" -lt 0 ]; then
+    echo "Warning: net entries negative ($net_entries). Setting to 0."
+    net_entries=0
 fi
 
-# Calculate total delegated
-total_delegated=$(awk "BEGIN {printf \"%.2f\", $delegate * $entries}")
+# Calculate total delegated based on net entries
+total_delegated=$(awk "BEGIN {printf \"%.2f\", $delegate * $net_entries}")
 
 # Extract 'reserveKeypair' from pool_keypairs.json
 reserveKeypair=$(jq -r '.reserveKeypair' "$KEYPAIRS_FILE")
@@ -54,15 +63,22 @@ total_serve_balance=$(awk "BEGIN {printf \"%.2f\", $total_delegated + $sol_balan
 final_balance=$(awk "BEGIN {printf \"%.2f\", $total_serve_balance - $reserve_value}")
 
 # Divide by total number of entries
-per_validator=$(awk "BEGIN {printf \"%.2f\", $final_balance / $entries}")
+per_validator=$(awk "BEGIN {printf \"%.2f\", $final_balance / $entries_total}")
 
-# Round down to nearest 0.1
-# Multiply by 10, floor, then divide by 10
-rounded_per_validator=$(awk "BEGIN {print int($per_validator * 10) / 10}")
+# Round down to nearest 0.01
+rounded_per_validator=$(awk "BEGIN {print int($per_validator * 1000) / 1000}")
 
 # Output the results with 'XNT' unit
 echo "Total delegated: ${total_delegated} XNT"
 echo "Total serve balance (before subtracting reserve): ${total_serve_balance} XNT"
 echo "Final balance after subtracting reserve: ${final_balance} XNT"
-echo "entries ${entries}"
-echo "Per validator (rounded down to 0.1): ${rounded_per_validator} XNT"
+echo "${entries_total}"
+echo "Per validator (rounded down to 0.01): ${rounded_per_validator} XNT"
+
+# Make sure redistribute.json exists
+if [ ! -f "$OUTPUT_FILE" ] || [ ! -s "$OUTPUT_FILE" ]; then
+  echo "{}" > "$OUTPUT_FILE"
+fi
+
+# Update only the redistributionAmount field in-place
+jq --argjson amount "$rounded_per_validator" '.redistributionAmount = $amount' "$OUTPUT_FILE" > "$OUTPUT_FILE.tmp" && mv "$OUTPUT_FILE.tmp" "$OUTPUT_FILE"
