@@ -39,6 +39,7 @@ while true; do
             echo "Staking to Pool Validators..."
             # Add your staking logic here
             node checkreserve.js 
+            sleep 5
             ./update.sh 
             ;;
         4)
