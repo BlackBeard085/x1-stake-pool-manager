@@ -87,7 +87,7 @@ while true; do
             ./get_pool_keypairs.sh
             ;;
         0)
-            exit 0
+            break
             ;;
         *)
             echo "Invalid choice. Please try again."
