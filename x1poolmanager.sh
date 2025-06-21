@@ -38,11 +38,12 @@ while true; do
         3)
             echo "Staking to Pool Validators..."
             # Add your staking logic here
-            ./stake_validators.sh 
+            node checkreserve.js 
             ./update.sh 
             ;;
         4)
             echo "Redistributing stake"
+            ./redistribute_logic.sh 
             ;;
         5)
             echo "Unstaking and Removing all Validators from the Pool..."
