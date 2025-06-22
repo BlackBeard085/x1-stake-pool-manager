@@ -111,9 +111,9 @@ if [ "$delegate_value_flag" = true ]; then
     # Delegate value is empty, zero, or '-'
     echo -e "\nDelegate value is empty, zero, or '-'. It is worth increasing all delegations.\n"
     echo -e "Increasing pool validator stake\n"
-    #  ./increase_redistribute_logic.sh
+      ./increase_redistribute_logic.sh
     echo -e "\nStaking to new pool validators"
-    #   ./stake_validators.sh
+       ./stake_validators.sh
 elif (( $(echo "$increase > 1" | bc -l) )); then
     echo -e "\nIt is worth increasing all delegations\n"
     echo -e "Increasing pool validator stake\n"
