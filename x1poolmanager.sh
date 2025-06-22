@@ -67,6 +67,8 @@ while true; do
             ./update.sh 
             > pool_validators.csv
             > staking_shortlist.csv
+            echo -e "\nSetting delegated amoutnto 0"
+            ./replace_delegate.sh
             ;;
         6)
             echo "Withdrawing from Pool..."

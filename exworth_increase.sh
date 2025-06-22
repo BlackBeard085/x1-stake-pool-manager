@@ -8,9 +8,12 @@ OUTPUT_FILE="redistribute.json"
 
 # Extract 'delegate' value from config.json
 delegate=$(jq -r '.delegate' "$CONFIG_FILE")
-if [ -z "$delegate" ] || [ "$delegate" == "null" ]; then
-    echo "Error: Could not extract 'delegate' from $CONFIG_FILE"
-    exit 1
+if [ -z "$delegate" ] || [ "$delegate" == " " ] || [ "$delegate" == "-" ] || [ "$delegate" == "0" ]; then
+    # Set delegate to 0 if value is empty, null, '-', or '0'
+    delegate=0
+    delegate_value_flag=true
+else
+    delegate_value_flag=false
 fi
 
 # Count entries in CSV excluding header
@@ -95,14 +98,21 @@ increase=$(awk "BEGIN {printf \"%.2f\", $redistribution_amount - $delegate}")
 # Output the increase
 echo "Each validator will receive an increase of: ${increase} XNT over the delegate value in config.json"
 
-# --- New conditional message based on increase ---
-if (( $(echo "$increase > 1" | bc -l) )); then
+# --- Determine if increasing all delegations is worth it ---
+if [ "$delegate_value_flag" = true ]; then
+    # Delegate value is empty, zero, or '-'
+    echo -e "\nDelegate value is empty, zero, or '-'. It is worth increasing all delegations.\n"
+    echo -e "Increasing pool validator stake\n"
+    #  ./increase_redistribute_logic.sh
+    echo -e "\nStaking to new pool validators"
+    #   ./stake_validators.sh
+elif (( $(echo "$increase > 1" | bc -l) )); then
     echo -e "\nIt is worth increasing all delegations\n"
     echo -e "Increasing pool validator stake\n"
-  #  ./increase_redistribute_logic.sh
-    echo -e "\n Staking to new pool validators"
- #   ./stake_validators.sh 
+    #  ./increase_redistribute_logic.sh
+    echo -e "\nStaking to new pool validators"
+    #   ./stake_validators.sh
 else
     echo "It is not worth increasing all delegations, can continue to delegate only to new pool entered validators"
-#    ./stake_validators.sh 
+    #    ./stake_validators.sh
 fi

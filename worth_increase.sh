@@ -6,11 +6,19 @@ ADD_TO_POOL_FILE="add_to_pool.txt"
 KEYPAIRS_FILE="pool_keypairs.json"
 OUTPUT_FILE="redistribute.json"
 
-# Extract 'delegate' value from config.json
+# Check and fix 'delegate' in config.json if empty or '-'
 delegate=$(jq -r '.delegate' "$CONFIG_FILE")
-if [ -z "$delegate" ] || [ "$delegate" == " " ] || [ "$delegate" == "-" ] || [ "$delegate" == "0" ]; then
-    # Set delegate to 0 if value is empty, null, '-', or '0'
-    delegate=0
+if [ -z "$delegate" ] || [ "$delegate" == "null" ] || [ "$delegate" == "-" ]; then
+  # Replace 'delegate' value with 0 in config.json
+  jq '.delegate = 0' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+  delegate=0
+fi
+
+# Extract 'delegate' value again after potential fix
+delegate=$(jq -r '.delegate' "$CONFIG_FILE")
+# Determine if delegate is empty, null, or '-'
+if [ -z "$delegate" ] || [ "$delegate" == "null" ] || [ "$delegate" == "-" ] || [ "$delegate" == "0" ]; then
+    # If delegate is empty, null, dash, or zero, consider increasing all delegations
     delegate_value_flag=true
 else
     delegate_value_flag=false
@@ -109,10 +117,10 @@ if [ "$delegate_value_flag" = true ]; then
 elif (( $(echo "$increase > 1" | bc -l) )); then
     echo -e "\nIt is worth increasing all delegations\n"
     echo -e "Increasing pool validator stake\n"
-    #  ./increase_redistribute_logic.sh
+    ./increase_redistribute_logic.sh
     echo -e "\nStaking to new pool validators"
-    #   ./stake_validators.sh
+    ./stake_validators.sh
 else
     echo "It is not worth increasing all delegations, can continue to delegate only to new pool entered validators"
-    #    ./stake_validators.sh
+    ./stake_validators.sh
 fi
