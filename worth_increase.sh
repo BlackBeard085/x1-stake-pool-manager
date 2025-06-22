@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Path to your files
 CONFIG_FILE="config.json"
 CSV_FILE="pool_validators.csv"
@@ -22,7 +21,6 @@ entries_in_add=$(wc -l < "$ADD_TO_POOL_FILE")
 
 # Calculate net entries
 net_entries=$(( entries_total - entries_in_add ))
-
 if [ "$net_entries" -lt 0 ]; then
     echo "Warning: net entries negative ($net_entries). Setting to 0."
     net_entries=0
@@ -40,7 +38,6 @@ fi
 
 # Run solana balance command
 balance_output=$(solana balance "$reserveKeypair" 2>/dev/null)
-
 if [ $? -ne 0 ] || [ -z "$balance_output" ]; then
     echo "Error: Failed to get balance for reserveKeypair"
     exit 1
@@ -66,9 +63,9 @@ final_balance=$(awk "BEGIN {printf \"%.2f\", $total_serve_balance - $reserve_val
 per_validator=$(awk "BEGIN {printf \"%.2f\", $final_balance / $entries_total}")
 
 # Round down to nearest 0.01
-rounded_per_validator=$(awk "BEGIN {print int($per_validator * 1000) / 1000}")
+rounded_per_validator=$(awk "BEGIN {print int($per_validator * 100) / 100}")
 
-# Output the results with 'XNT' unit
+# Output the results
 echo "Total delegated: ${total_delegated} XNT"
 echo "Total serve balance (before subtracting reserve): ${total_serve_balance} XNT"
 echo "Final balance after subtracting reserve to delegate: ${final_balance} XNT"
@@ -82,3 +79,30 @@ fi
 
 # Update only the redistributionAmount field in-place
 jq --argjson amount "$rounded_per_validator" '.redistributionAmount = $amount' "$OUTPUT_FILE" > "$OUTPUT_FILE.tmp" && mv "$OUTPUT_FILE.tmp" "$OUTPUT_FILE"
+
+# --- New addition: Calculate the increase per validator ---
+
+# Extract redistributionAmount from redistribute.json
+redistribution_amount=$(jq -r '.redistributionAmount' "$OUTPUT_FILE")
+if [ -z "$redistribution_amount" ] || [ "$redistribution_amount" == "null" ]; then
+    echo "Error: Could not extract 'redistributionAmount' from $OUTPUT_FILE"
+    exit 1
+fi
+
+# Calculate increase over delegate
+increase=$(awk "BEGIN {printf \"%.2f\", $redistribution_amount - $delegate}")
+
+# Output the increase
+echo "Each validator will receive an increase of: ${increase} XNT over the delegate value in config.json"
+
+# --- New conditional message based on increase ---
+if (( $(echo "$increase > 1" | bc -l) )); then
+    echo -e "\nIt is worth increasing all delegations\n"
+    echo -e "Increasing pool validator stake\n"
+  #  ./increase_redistribute_logic.sh
+    echo -e "\n Staking to new pool validators"
+ #   ./stake_validators.sh 
+else
+    echo "It is not worth increasing all delegations, can continue to delegate only to new pool entered validators"
+#    ./stake_validators.sh 
+fi

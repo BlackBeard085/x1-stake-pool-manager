@@ -5,7 +5,7 @@ const csv = require('csv-parser'); // Make sure to install via npm: npm install 
 // File paths
 const csvFilePath = 'pool_validators.csv';
 const addToPoolFilePath = 'add_to_pool.txt';
-const reduceStakeFilePath = 'reduce_stake_accounts.txt';
+const amendStakeFilePath = 'amend_stake_accounts.txt';
 
 // Read add_to_pool.txt into a Set for quick lookup
 async function loadAddToPool() {
@@ -29,7 +29,7 @@ async function loadAddToPool() {
 // Process CSV and write filtered pubkeys
 async function processValidators() {
   const addToPoolPubkeys = await loadAddToPool();
-  const outputStream = fs.createWriteStream(reduceStakeFilePath);
+  const outputStream = fs.createWriteStream(amendStakeFilePath);
 
   fs.createReadStream(csvFilePath)
     .pipe(csv())
@@ -40,7 +40,7 @@ async function processValidators() {
       }
     })
     .on('end', () => {
-      console.log(`Filtered pubkeys written to ${reduceStakeFilePath}`);
+      console.log(`Filtered pubkeys written to ${amendStakeFilePath}`);
       outputStream.end();
     })
     .on('error', (err) => {

@@ -35,5 +35,5 @@ decrease_stakes () {
 }
 
 stake_pool_pubkey=$(solana-keygen pubkey "$stake_pool_keyfile")
-echo "Increasing amount delegated to each validator in stake pool"
+echo "Decreasing amount delegated to each validator in stake pool"
 decrease_stakes "$stake_pool_pubkey" "$validator_list" "$sol_amount"

@@ -22,5 +22,5 @@ fi
 AMEND_STAKE_FILE="amend_stake_accounts.txt"
 
 # Execute the command
-./reduce_rebalance.sh "$STAKE_POOL_KEYPAIR" "$AMEND_STAKE_FILE" "$AMOUNT_FOR_EACH_VALIDATOR"
+./rebalance.sh "$STAKE_POOL_KEYPAIR" "$AMEND_STAKE_FILE" "$AMOUNT_FOR_EACH_VALIDATOR"
 

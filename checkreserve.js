@@ -53,7 +53,7 @@ if (postDelegationReserve > reserveConfig) {
     console.log(`Can delegate: Post delegation reserve (${postDelegationReserve} SOL) is higher than reserve (${reserveConfig} SOL).`);
     // Run the script if delegation is possible
     try {
-        execSync('./stake_validators.sh', { stdio: 'inherit' });
+        execSync('./worth_increase.sh', { stdio: 'inherit' });
     } catch (err) {
         console.error('Error executing ./stake_validators.sh:', err);
         process.exit(1);
