@@ -110,4 +110,12 @@ else
 
   echo "redistributionAmount set to: $redistributionAmount"
   echo "requestedWithdrawal set to: $withdrawal_amount"
+   #list validators that require their stakes amending
+    node amend_stake_accounts.js
+    #Action the reduction in stake
+    ./decrease_stake_validators.sh
+    #ammend the new delegation amount to future validator shortlists
+    ./new_delegate_amount.sh
+    #clear validator list that had stakes reduced
+    > amend_stake_accounts.txt
 fi
