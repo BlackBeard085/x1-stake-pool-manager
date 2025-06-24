@@ -6,7 +6,7 @@ Welcome to X1's stake Pool Manager - Jack The Ripper, an interactive, automated 
 ![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/JackTheRipper.jpg)
 
 ## Recommended Sequence of manual operation
-If you run the manager manually it is recommended to run the operations in the following order as stakes will take 1 epoch to deactivate after removing validators from tje pool and the pool reserve balance to update accordingly.
+If you run the manager manually it is recommended to run the operations in the following order as stakes will take 1 epoch to deactivate after removing validators from the pool and the pool reserve balance to update accordingly.
 
 
 
