@@ -26,10 +26,14 @@ async function main() {
     const shortlistCount = await countCsvEntries('staking_shortlist.csv');
     const prePoolCount = await countCsvEntries('pool_validators.csv');
 
-    // 5. Get epoch info
+    // 5. Read failed_to_add.txt and failed_to_remove.txt counts
+    const failedToAddCount = await countTextEntries('failed_to_add.txt');
+    const failedToRemoveCount = await countTextEntries('failed_to_remove.txt');
+
+    // 6. Get epoch info
     const epochInfo = await getEpochInfo();
 
-    // 6. Display info
+    // 7. Display info
     console.log(`\nRPC URL: ${rpcUrl}`);
     if (epochInfo) {
       console.log(`Current Epoch: ${epochInfo.epoch} - ${epochInfo.remainingTime} remaining\n`);
@@ -76,6 +80,19 @@ async function main() {
       '|' + pad('', columnWidths.delinquent);
     console.log(prePoolRow);
 
+    // Additional rows for failed_to_add.txt and failed_to_remove.txt
+    const failedAddRow = pad('Failed to Add', columnWidths.label) +
+      '|' + pad(String(failedToAddCount), columnWidths.total) +
+      '|' + pad('', columnWidths.active) +
+      '|' + pad('', columnWidths.delinquent);
+    console.log(failedAddRow);
+
+    const failedRemoveRow = pad('Failed to Remove', columnWidths.label) +
+      '|' + pad(String(failedToRemoveCount), columnWidths.total) +
+      '|' + pad('', columnWidths.active) +
+      '|' + pad('', columnWidths.delinquent);
+    console.log(failedRemoveRow);
+
     // Bottom separator
     console.log(separator);
 
@@ -104,6 +121,17 @@ async function countCsvEntries(filename) {
     if (lines.length > 0) {
       lines.shift(); // remove the first line after header
     }
+    return lines.length;
+  } catch (err) {
+    // If file doesn't exist or error, treat as zero
+    return 0;
+  }
+}
+
+async function countTextEntries(filename) {
+  try {
+    const data = await readFile(filename, 'utf8');
+    const lines = data.split('\n').filter(line => line.trim() !== '');
     return lines.length;
   } catch (err) {
     // If file doesn't exist or error, treat as zero

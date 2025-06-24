@@ -24,3 +24,5 @@ ADD_TO_POOL_FILE="add_to_pool.txt"
 # Execute the command
 ./rebalance.sh "$STAKE_POOL_KEYPAIR" "$ADD_TO_POOL_FILE" "$AMOUNT_FOR_EACH_VALIDATOR"
 
+echo -e "\nStaked to new validators, clearing add validator list"
+> add_to_pool.txt

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./checkpoolcount.sh
+
 while true; do
     # Run the commands before showing options
     node x1poolmanager.js

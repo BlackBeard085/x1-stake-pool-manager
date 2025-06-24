@@ -53,11 +53,18 @@ if (postDelegationReserve > reserveConfig) {
     console.log(`Can delegate: Post delegation reserve (${postDelegationReserve} SOL) is higher than reserve (${reserveConfig} SOL).`);
     // Run the script if delegation is possible
     try {
-        execSync('./worth_increase.sh', { stdio: 'inherit' });
+        execSync('./autoworth_increase.sh', { stdio: 'inherit' });
     } catch (err) {
-        console.error('Error executing ./worth_increase.sh:', err);
+        console.error('Error executing ./autoworth_increase.sh:', err);
         process.exit(1);
     }
 } else {
-    console.log(`Increase reserve before delegations or redistribute stake: Post delegation reserve (${postDelegationReserve} SOL) is less than minimum set reserve (${reserveConfig} SOL).`);
+    console.log(`Reserve is not enough to stake new validators, redistributing stake: Post delegation reserve (${postDelegationReserve} SOL) is less than minimum set reserve (${reserveConfig} SOL).`);
+    // Run the script
+    try {
+        execSync('./autoredistribute_logic.sh', { stdio: 'inherit' });
+    } catch (err) {
+        console.error('Error executing ./autoredistribute_logic.sh:', err);
+        process.exit(1);
+    }
 }
