@@ -55,16 +55,24 @@ else
   total_entries=$(($(wc -l < "$POOL_VALIDATORS_FILE") - 1))
   add_entries=$(grep -v '^$' "$ADD_TO_POOL_FILE" | wc -l)
   net_entries=$((total_entries - add_entries))
-  if [ "$net_entries" -le 0 ]; then
-    echo "Error: No net entries for calculation."
+  
+  # Handle special case: zero entries
+  if [ "$total_entries" -eq 0 ] || [ "$net_entries" -eq 0 ]; then
+    echo "Pool has insufficient funds to process this withdrawal and keep the minimum reserve balance. Either reduce the minimum reserve balance or request a smaller amount to withdraw."
     exit 1
   fi
 
-  # Calculate amendedAmount = user_input / net_entries
+  # Calculate raw amount and amendedAmount
   raw_amount=$(echo "scale=10; $withdrawal_amount / $net_entries" | bc)
   amendedAmount=$(awk -v val="$raw_amount" 'BEGIN {
       printf "%.4f", ( (val * 10000) == int(val * 10000) ? val : (int(val * 10000 + 0.9999))/10000 )
   }')
+
+  # Check if amendedAmount is negative
+  if (( $(echo "$amendedAmount < 0" | bc -l) )); then
+    echo "Pool has insufficient funds to process this withdrawl and keep the minimum reserve balance. Either reduce the minimum reserve balance or request a smaller amount to withdraw."
+    exit 1
+  fi
 
   # Save amendedAmount in redistribute.json
   if [ -f "$REDISTRIBUTE_FILE" ]; then
@@ -96,5 +104,10 @@ else
   fi
   mv tmp_redistribute.json "$REDISTRIBUTE_FILE"
 
+  # Save requested withdrawal
+  jq --arg req "$withdrawal_amount" '.requestedWithdrawal = ($req | tonumber)' "$REDISTRIBUTE_FILE" > tmp_redistribute.json
+  mv tmp_redistribute.json "$REDISTRIBUTE_FILE"
+
   echo "redistributionAmount set to: $redistributionAmount"
+  echo "requestedWithdrawal set to: $withdrawal_amount"
 fi
