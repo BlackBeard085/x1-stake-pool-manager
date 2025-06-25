@@ -73,10 +73,24 @@ while true; do
             ./replace_delegate.sh
             ;;
         6)
-            echo "Withdrawing from Pool..."
-            # Add your withdrawal logic here
-            ./withdraw_reserve.sh
-            ;;
+            echo -e "\nChoose a subcommand:"
+                echo -e "1. Make Withdrawl"
+                echo -e "2. Initiate Withdrawl"
+                read -p "Enter your choice [1-2]: " update_choice
+
+                case $update_choice in
+                    1)
+                         ./withdraw_reserve.sh
+                        ;;
+                    2)
+                        ./initiate_withdraw.sh
+                        ;;
+                    *)
+                        echo -e "\nInvalid subcommand choice. Returning to main menu.\n"
+                        ;;
+                esac
+                ;;
+
         7)
             echo "Updating Pool data..."
             # Add your update Pool logic here

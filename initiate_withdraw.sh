@@ -63,7 +63,7 @@ else
   fi
 
   # Calculate raw amount and amendedAmount
-  raw_amount=$(echo "scale=10; $withdrawal_amount / $net_entries" | bc)
+  raw_amount=$(echo "scale=10; ($withdrawal_amount + ($net_entries * 0.001)) / $net_entries" | bc)
   amendedAmount=$(awk -v val="$raw_amount" 'BEGIN {
       printf "%.4f", ( (val * 10000) == int(val * 10000) ? val : (int(val * 10000 + 0.9999))/10000 )
   }')
