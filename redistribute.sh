@@ -60,7 +60,7 @@ fi
 total_serve_balance=$(awk "BEGIN {printf \"%.2f\", $total_delegated + $sol_balance}")
 
 # Subtract reserve value
-final_balance=$(awk "BEGIN {printf \"%.2f\", $total_serve_balance - $reserve_value}")
+final_balance=$(awk "BEGIN {printf \"%.2f\", $total_serve_balance - ($reserve_value + (net_entries * 0.009))}")
 
 # Divide by total number of entries
 per_validator=$(awk "BEGIN {printf \"%.2f\", $final_balance / $entries_total}")
