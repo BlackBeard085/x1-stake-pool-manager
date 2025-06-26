@@ -5,11 +5,6 @@ Welcome to X1's stake Pool Manager - Jack The Ripper, an interactive, automated 
 
 ![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/JackTheRipper.jpg)
 
-## Recommended Sequence of manual operation
-If you run the manager manually it is recommended to run the operations in the following order as stakes will take 1 epoch to deactivate after removing validators from the pool and the pool reserve balance to update accordingly.
-
-
-
 ## Requirements
 You will need to create a stake pool using the SPL Stake Pool program and have access to the generated keys for the stake pool.
 
@@ -61,8 +56,8 @@ These can be as lenient or as strict as you like. To exclude a parameter from ve
    What is the minimum Total Credits requirement:                  #total credits will enforce minimum uptime requirement
    Please enter the minimum latency requirement:                      #higher latency will be excluded
    Please enter the Validator average credits requirment (0 - 8000):  #lower average credits will be excluded.
-   What is the minimum amount of XNT you wish to keep in the reserve? 
-   How much would you like to delegate to each validator? 
+   What is the minimum amount of XNT you wish to keep in the reserve?  #The pool will maintain this amount in the pool
+   How much has been delegated to each validator? Set to 0 for new pools:  #The pool manager will decide optimal stake for validators
    ```
 
 ## Fund the Stake Pool
@@ -75,23 +70,27 @@ Select Option 2 to automatically check all current validators on chain, their pe
 ![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/StakepoolManagerFlowchart.jpg)
 
 ## Stake to Pool Validators
-Once the program has selected the qualifying validators, select option 3 to stake to all validators the amount specified in the configuration setup. All validators will be staked by this amount.
+Once the manager has selected the qualifying validators, select option 3 to stake to newly added validators or increase existing validator stakes. The manager will decide the maximum stake possible for the validators based on funds available and the minimum reserve balance set. 
 
-***Function to be added - all validators will be staked by the requested amount and maintaining a minimum balance within the stake pool. If the balance drops below the minimum amount set, the manager will prompt you to change the staking amount to maintain a minimum reserve balance.
+###IMPORTANT - ONLY STAKE ONCE PER EPOCH. AWAIT NEXT EPOCH AND UPDATE THE POOL DATA BEFORE STAKING AGAIN TO NEW VALIDATORS
+
+## Redistribute Stake
+If more validators are added it maybe required to reduce existing pool validator stakes to evenly distribute stake to all validators. This will calculate reditribution amounts and reduce existing delegates stakes to accomodate new delegations. After redistribution await next epoch and update before delegating to new validators.
 
 ## Remove all Validators
-Option 4 will create a backup of the current validators in the stake pool and attempt to remove all validators within the pool before clearing the poll validator list and shortlist.
+Option 5 will create a backup of the current validators in the stake pool and attempt to remove all validators within the pool before clearing the poll validator list and shortlist.
 
 ## Withdraw Unstaked Reserve Funds
-Option 5, withdraw any amount that is not staked to Validators.
+Option 6, withdraw any amount that is not staked to Validators.
 
 ## Update Pool data
-option 6 or manual command
+option 7 or manual command
 ```bash
    ./update.sh
    ```
 to update pool data. Once validators are added or removed from the pool, it may need updating to show the more upto date number of validators or reserve balance. Usually required on the following Epoch after removing validators from the pool.
 
-
+## Set Auto Pool Manager
+Option 10, turn Auto pool manager ON or OFF. it will automate the whole vetting, shorlisting, staking and redistribuiton of stake to validators. Since every epoch may require some validators to be removed from the pool you may see a descrepancy between validators in the pool and validators shorlisted. This will resync if you turn Auto pool manager off and update the pool data on tje following epoch.
 
 
