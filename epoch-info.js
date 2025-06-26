@@ -59,7 +59,7 @@ async function main() {
     console.log(separator);
 
     // Validators row
-    const validatorRow = pad('Validators', columnWidths.label) +
+    const validatorRow = pad('Chain Validators', columnWidths.label) +
       '|' + pad(String(total), columnWidths.total) +
       '|' + pad(String(active), columnWidths.active) +
       '|' + pad(String(delinquent), columnWidths.delinquent);

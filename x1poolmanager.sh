@@ -19,7 +19,7 @@ while true; do
     echo "4. Redistribute Stake"
     echo "5. Unstake All Validators"
     echo "6. Withdraw from Pool"
-    echo "7. Update Pool"
+    echo "7. Update Pool Data"
     echo "8. Set Parameters"
     echo "9. Connect Pool"
     echo "10. Setup Auto Pool Manager"
@@ -72,6 +72,7 @@ while true; do
             ./update.sh 
             > pool_validators.csv
             > staking_shortlist.csv
+            > add_to_pool.txt
             echo -e "\nSetting delegated amount to 0"
             ./replace_delegate.sh
             ;;

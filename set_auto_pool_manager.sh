@@ -2,7 +2,7 @@
 
 # Define variables
 CRON_COMMENT="# Auto Pool Manager cron job"
-CRON_JOB="0 0 * * * ~/x1-stake-pool-manager && ./autopoolmanager.sh # Auto Pool Manager cron job"
+CRON_JOB="0 0 * * * cd ~/x1-stake-pool-manager && ./autopoolmanager.sh # Auto Pool Manager cron job"
 
 # Function to add cron job
 add_cron() {
