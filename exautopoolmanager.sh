@@ -1,15 +1,28 @@
 #!/bin/bash
 
-CONFIG_FILE="config.json"
+#export solana node jq and cargo PATH
+export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+export PATH="$HOME/.nvm/versions/node/v20.0.0/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
 
-# Fetch current epoch from solana
-CURRENT_EPOCH=$(solana epoch-info --output=json | jq -r '.epoch')
+CONFIG_FILE="config.json"
 
 # Check if config.json exists
 if [ ! -f "$CONFIG_FILE" ]; then
   echo "Error: $CONFIG_FILE not found."
   exit 1
 fi
+
+# Check if 'initiatedWithdraw' exists and its value
+INITIATED_WITHDRAW=$(jq -r '.initiatedWithdraw // empty' "$CONFIG_FILE")
+
+if [ "$INITIATED_WITHDRAW" == "yes" ]; then
+  echo "A withdrawl has been initiated. Auto pool manager is paused till withdrawl has been processed."
+  exit 0
+fi
+
+# Fetch current epoch from solana
+CURRENT_EPOCH=$(solana epoch-info --output=json | jq -r '.epoch')
 
 # Check if 'epoch' exists in config.json
 EXISTING_EPOCH=$(jq -r '.epoch // empty' "$CONFIG_FILE")
