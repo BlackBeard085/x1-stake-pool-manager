@@ -26,9 +26,8 @@ async function main() {
     const shortlistCount = await countCsvEntries('staking_shortlist.csv');
     const prePoolCount = await countCsvEntries('pool_validators.csv');
 
-    // 5. Read failed_to_add.txt and failed_to_remove.txt counts
-    const failedToAddCount = await countTextEntries('failed_to_add.log');
-    const failedToRemoveCount = await countTextEntries('failed_to_remove.log');
+    // 5. Read add_to_pool.txt for 'Awaiting stake' count
+    const awaitingStakeCount = await countTextEntries('add_to_pool.txt');
 
     // 6. Get epoch info
     const epochInfo = await getEpochInfo();
@@ -80,18 +79,12 @@ async function main() {
       '|' + pad('', columnWidths.delinquent);
     console.log(prePoolRow);
 
-    // Additional rows for failed_to_add.txt and failed_to_remove.txt
-    const failedAddRow = pad('Failed to Add', columnWidths.label) +
-      '|' + pad(String(failedToAddCount), columnWidths.total) +
+    // Awaiting Stake row
+    const awaitingStakeRow = pad('Awaiting Stake', columnWidths.label) +
+      '|' + pad(String(awaitingStakeCount), columnWidths.total) +
       '|' + pad('', columnWidths.active) +
       '|' + pad('', columnWidths.delinquent);
-    console.log(failedAddRow);
-
-    const failedRemoveRow = pad('Failed to Remove', columnWidths.label) +
-      '|' + pad(String(failedToRemoveCount), columnWidths.total) +
-      '|' + pad('', columnWidths.active) +
-      '|' + pad('', columnWidths.delinquent);
-    console.log(failedRemoveRow);
+    console.log(awaitingStakeRow);
 
     // Bottom separator
     console.log(separator);
@@ -117,7 +110,7 @@ async function countCsvEntries(filename) {
     if (lines.length > 0 && lines[0].toLowerCase().includes('header')) {
       lines.shift();
     }
-    // Exclude the first data line
+    // Remove the first data line if present
     if (lines.length > 0) {
       lines.shift(); // remove the first line after header
     }

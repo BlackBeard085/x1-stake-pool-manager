@@ -33,9 +33,9 @@ while true; do
             ./fundpool.sh
             ;;
         2)
-            echo "Updating Pool, Prepool, and Shortlist..."
+            echo "Ensuring new validators delegated before updating pool"
             # Add your update pool validators logic here
-            ./update_pool_validators.sh
+            ./check_add_list.sh
             
             ;;
         3)
@@ -43,6 +43,7 @@ while true; do
             # Add your staking logic here
             node checkreserve.js 
             sleep 5
+            echo -e "\nUpdating pool." 
             ./update.sh 
             ;;
         4)
