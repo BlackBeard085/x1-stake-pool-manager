@@ -78,7 +78,7 @@ rounded_per_validator=$(awk "BEGIN {print int($per_validator * 100) / 100}")
 
 # Output the results
 echo "Total delegated: ${total_delegated} XNT"
-echo "Total serve balance (before subtracting reserve): ${total_serve_balance} XNT"
+echo "Total reserve balance (before subtracting min reserve): ${total_serve_balance} XNT"
 echo "Final balance after subtracting reserve to delegate: ${final_balance} XNT"
 echo "${entries_total}"
 echo "To delegate Per validator (rounded down to 0.01): ${rounded_per_validator} XNT"
@@ -118,7 +118,7 @@ elif (( $(echo "$increase > 0.01" | bc -l) )); then
     echo -e "\nIt is worth increasing all delegations\n"
     echo -e "Increasing pool validator stake\n"
     ./increase_redistribute_logic.sh
-    echo -e "\nStaking to new pool validators"
+    echo -e "\nIncreased stake to existing pool validators"
 #    ./stake_validators.sh
 else
     echo "It is not worth increasing all delegations, can continue to delegate only to new pool entered validators"

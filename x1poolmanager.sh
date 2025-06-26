@@ -6,6 +6,7 @@ while true; do
     # Run the commands before showing options
     node x1poolmanager.js
     node epoch-info.js
+    node failedcount.js
 
     # Add a blank line for readability
     echo

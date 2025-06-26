@@ -78,7 +78,7 @@ rounded_per_validator=$(awk "BEGIN {print int($per_validator * 100) / 100}")
 
 # Output the results
 echo "Total delegated: ${total_delegated} XNT"
-echo "Total serve balance (before subtracting reserve): ${total_serve_balance} XNT"
+echo "Total reserve balance (before subtracting min reserve): ${total_serve_balance} XNT"
 echo "Final balance after subtracting reserve to delegate: ${final_balance} XNT"
 echo "${entries_total}"
 echo "To delegate Per validator (rounded down to 0.01): ${rounded_per_validator} XNT"
