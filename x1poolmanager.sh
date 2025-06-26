@@ -21,8 +21,9 @@ while true; do
     echo "7. Update Pool"
     echo "8. Set Parameters"
     echo "9. Connect Pool"
+    echo "10. Setup Auto Pool Manager"
     echo "0. Exit"
-    read -p "Enter your choice (0-9): " choice
+    read -p "Enter your choice (0-10): " choice
     echo
 
     case "$choice" in
@@ -105,6 +106,10 @@ while true; do
             echo "Connecting Pool..."
             # Add your connect pool logic here
             ./get_pool_keypairs.sh
+            ;;
+       10)
+            echo "Opening Auto Pool Manager Setting"
+            ./set_auto_pool_manager.sh
             ;;
         0)
             break

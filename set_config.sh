@@ -61,7 +61,7 @@ total_credits=$(prompt "What is the minimum Total Credits requirement: " '^[0-9]
 latency=$(prompt "Please enter the minimum latency requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
 avg_credits=$(prompt "Please enter the Validator average credits requirement (0 - 8000): " '^[0-9]+$' 0 8000)
 reserve=$(prompt "What is the minimum amount of XNT you wish to keep in the reserve? " '^[0-9]+(\.[0-9]+)?$' '' '')
-delegate=$(prompt "How much would you like to delegate to each validator? " '^[0-9]+(\.[0-9]+)?$' '' '')
+delegate=$(prompt "How much has been delegated to each validator? Set to 0 for new pools " '^[0-9]+(\.[0-9]+)?$' '' '')
 
 # Function to update JSON with either number or string
 update_json() {

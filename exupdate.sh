@@ -29,30 +29,5 @@ fi
 # Note: This assumes the command is a string, possibly containing a tilde
 expanded_command=$(eval echo "$splStakePoolCommand")
 
-# Retry logic parameters
-MAX_RETRIES=5
-RETRY_COUNT=0
-SLEEP_INTERVAL=2  # seconds
-
-while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-  echo "Attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
-  
-  # Run the update command
-  $expanded_command update "$pooladdress"
-  
-  # Check if command succeeded
-  if [ $? -eq 0 ]; then
-    echo "Update succeeded."
-    break
-  else
-    echo "Update failed."
-    RETRY_COUNT=$((RETRY_COUNT + 1))
-    if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
-      echo "Retrying in $SLEEP_INTERVAL seconds..."
-      sleep $SLEEP_INTERVAL
-    else
-      echo "Max retries reached. Exiting."
-      exit 1
-    fi
-  fi
-done
+# Run the update command
+$expanded_command update "$pooladdress"

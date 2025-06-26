@@ -12,3 +12,5 @@ failed_to_remove.log
 redistribute.json
 reduce_stake_accounts.txt
 amend_stake_accounts.txt
+failed_to_increase_stake.txt
+failed_to_decrease_stake.txt

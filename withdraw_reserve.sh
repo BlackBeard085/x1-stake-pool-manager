@@ -62,9 +62,11 @@ remaining=$(echo "$available_balance - $amount" | bc)
 # Check if withdrawal is possible (remaining >= 0.1 SOL)
 comparison=$(echo "$remaining >= 0.1" | bc)
 if [ "$comparison" -eq 1 ]; then
-  echo "You can withdraw."
+  echo "Processing withdrawl."
+  sleep 3
 else
-  echo "Insufficient balance to withdraw the requested amount."
+  echo "Insufficient balance to withdraw the requested amount and keeping requested minimum reserve. Initaiate a withdrawl for larger amounts or request a smaller amount of funds to withdraw."
+  sleep 3
   exit 1
 fi
 

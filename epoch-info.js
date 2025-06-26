@@ -27,8 +27,8 @@ async function main() {
     const prePoolCount = await countCsvEntries('pool_validators.csv');
 
     // 5. Read failed_to_add.txt and failed_to_remove.txt counts
-    const failedToAddCount = await countTextEntries('failed_to_add.txt');
-    const failedToRemoveCount = await countTextEntries('failed_to_remove.txt');
+    const failedToAddCount = await countTextEntries('failed_to_add.log');
+    const failedToRemoveCount = await countTextEntries('failed_to_remove.log');
 
     // 6. Get epoch info
     const epochInfo = await getEpochInfo();

@@ -42,9 +42,11 @@ remaining=$(echo "$available_balance - $withdrawal_amount" | bc)
 # Check if withdrawal is possible
 comparison=$(echo "$remaining >= 0.1" | bc)
 if [ "$comparison" -eq 1 ]; then
-  echo "You can withdraw."
+  echo "withdrawl is possible with available reserve funds. Please select the withdraw option."
+  sleep 3
 else
-  echo "Insufficient balance to withdraw the requested amount."
+  echo "Insufficient balance to withdraw the requested amount. Initiating withdrawl"
+  sleep3
 
   # Update initiatedWithdraw to "yes" in config.json
   jq 'if has("initiatedWithdraw") then . else . + {"initiatedWithdraw":"yes"} end' "$CONFIG_FILE" > tmp_config.json && mv tmp_config.json "$CONFIG_FILE"
