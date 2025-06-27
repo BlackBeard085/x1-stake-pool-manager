@@ -48,7 +48,7 @@ These can be as lenient or as strict as you like. To exclude a parameter from ve
 
 ```bash
    Enter a value for each parameter or '-' to exclude the metric from vetting
-   Enter the maximum skip rate a validator can have (10 for 10%):  #higher skip rates will be excluded from the pool
+   Enter the maximum acceptable skip rate (10 for 10%):  #higher skip rates will be excluded from the pool
    Enter the maximum commission the validator can charge:          #higher commisions will be excluded from the pool
    Enter the minimum active stake requirement:                     #lower stake will be excluded from the pool
    Enter the maximum active stake requirment:                      #higher stake will be excluded from the pool
