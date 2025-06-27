@@ -8,13 +8,9 @@ const files = [
   { filename: 'failed_to_decrease_stake.txt', label: 'decreasing' }
 ];
 
-// Function to get line count of a file, returns 0 if file doesn't exist
+// Function to get line count of a file
 function getLineCount(filePath) {
   try {
-    if (!fs.existsSync(filePath)) {
-      // File does not exist
-      return 0;
-    }
     const data = fs.readFileSync(filePath, 'utf8');
     // Split by newline, filter out empty lines
     const lines = data.split(/\r?\n/).filter(line => line.trim() !== '');
@@ -39,7 +35,7 @@ console.log('| adding | removal | increasing | decreasing |');
 // Print dashed line
 console.log('|--------|---------|------------|------------|');
 
-// Print data row with padding for alignment
+// Print data row
 console.log(
   `| ${counts[0].count.toString().padStart(6)} | ` +
   `${counts[1].count.toString().padStart(7)} | ` +
