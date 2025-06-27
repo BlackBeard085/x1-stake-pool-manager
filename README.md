@@ -69,6 +69,7 @@ Select Option 2 to automatically check all current validators on chain, their pe
 
 ![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/StakepoolManagerFlowchart.jpg)
 
+Once Pool validators have been added keep a backup of the validator list in the pool. This is the pool_validators.csv file.
 ## Stake to Pool Validators
 Once the manager has selected the qualifying validators, select option 3 to stake to newly added validators or increase existing validator stakes. The manager will decide the maximum stake possible for the validators based on funds available and the minimum reserve balance set. 
 
