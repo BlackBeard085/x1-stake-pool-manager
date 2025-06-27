@@ -49,7 +49,7 @@ prompt() {
 # Collect inputs
 echo -e "\nEnter a value for each parameter or '-' to exclude the metric from vetting \n"
 
-skip_rate=$(prompt "Enter the maximum skip rate a validator can have (e.g., 10 for 10%): " '^[0-9]+(\.[0-9]+)?$' 0 100)
+skip_rate=$(prompt "Enter the maximum acceptable skip rate (e.g., 10 for 10%): " '^[0-9]+(\.[0-9]+)?$' 0 100)
 commission_limit=$(prompt "Enter the maximum commission the validator can charge: " '^[0-9]+(\.[0-9]+)?$' 0 100)
 min_active_stake=$(prompt "Enter the minimum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
 max_active_stake=$(prompt "Enter the maximum active stake requirment: " '^[0-9]+(\.[0-9]+)?$' '' '')
