@@ -8,6 +8,14 @@ export PATH="$HOME/.cargo/bin:$PATH"
 LOG_FILE="auto_pool_manager.log"
 CONFIG_FILE="config.json"
 
+# Check if log file exists and its size, truncate if larger than 1GB
+if [ -f "$LOG_FILE" ]; then
+  LOG_SIZE=$(stat -c%s "$LOG_FILE")
+  if [ "$LOG_SIZE" -gt 1073741824 ]; then
+    > "$LOG_FILE"
+  fi
+fi
+
 # Function to log messages with timestamp
 log() {
   echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
