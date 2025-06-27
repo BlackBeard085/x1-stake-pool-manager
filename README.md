@@ -96,4 +96,21 @@ Option 10, turn Auto pool manager ON or OFF. it will automate the whole vetting,
 
 All Auto Pool Manager activity is logged in 'auto_pool_manager.log' file.
 
+## Importing Pool with Validators
+If you are importing an existing pool that has vaidators in you can import them into the manager by creating a 'pool_validators.csv' and 'add_to_pool.txt' files.
 
+structure of the files.
+pool_validators.csv
+```bash
+   Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency
+   <vote address 1>
+   <vote address 2>
+   ```
+
+add_to_pool.txt
+```bash
+   <vote address 1>
+   <vote address 2>
+   ```
+
+Replace the vote addresses of the validator vote account already in the pool.
