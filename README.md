@@ -92,6 +92,8 @@ option 7 or manual command
 to update pool data. Once validators are added or removed from the pool, it may need updating to show the more upto date number of validators or reserve balance. Usually required on the following Epoch after removing validators from the pool.
 
 ## Set Auto Pool Manager
-Option 10, turn Auto pool manager ON or OFF. it will automate the whole vetting, shorlisting, staking and redistribuiton of stake to validators. Since every epoch may require some validators to be removed from the pool you may see a descrepancy between validators in the pool and validators shorlisted. This will resync if you turn Auto pool manager off and update the pool data on tje following epoch.
+Option 10, turn Auto pool manager ON or OFF. it will automate the whole vetting, shorlisting, staking and redistribuiton of stake to validators. Since every epoch may require some validators to be removed from the pool you may see a descrepancy between validators in the pool and validators shorlisted. This will resync if you turn Auto pool manager off and update the pool data on the following epoch.
+
+All Auto Pool Manager activity is logged in 'auto_pool_manager.log' file.
 
 
