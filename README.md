@@ -27,7 +27,7 @@ A notification on dash will prompt user to connect a pool to the manager.
 
 ## Connecting a SPL Stake Pool
 
-On the opening dash, select Option 7, Connect Pool, to set up your SPL Stake Pool with the stake pool manager. You will asked to input the keypair paths to the SPL Stake Pool generated accounts and also the path to the spl-stake-pool binary or command prompt. 
+On the opening dash, select Option 9, Connect Pool, to set up your SPL Stake Pool with the stake pool manager. You will asked to input the keypair paths to the SPL Stake Pool generated accounts and also the path to the spl-stake-pool binary or command prompt. 
 
 ```bash
    Please enter X1 Stake Pool keypair:
@@ -43,7 +43,7 @@ Once Connected, the pool details will show upon the dashboard. This image shows 
 ![Alt text](https://raw.githubusercontent.com/BlackBeard085/Images/refs/heads/main/StakePoolManagerMenu.jpg)
 
 ## Setting up Stake Pool and Shortlist Parameters
-Select Option 6 or edit the config.json to set the parameters of the pool and condtions the validators must meet to be shortlisted.
+Select Option 8 or edit the config.json to set the parameters of the pool and condtions the validators must meet to be shortlisted.
 These can be as lenient or as strict as you like. To exclude a parameter from vetting enter '-'
 
 ```bash
