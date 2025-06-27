@@ -103,14 +103,14 @@ structure of the files.
 pool_validators.csv
 ```bash
    Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency
-   <vote address 1>
-   <vote address 2>
+   #<vote address 1>
+   #<vote address 2>
    ```
 
 add_to_pool.txt
 ```bash
-   <vote address 1>
-   <vote address 2>
+   #<vote address 1>
+   #<vote address 2>
    ```
 
 Replace the vote addresses of the validator vote account already in the pool.
