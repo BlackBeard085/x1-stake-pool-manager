@@ -1,19 +1,5 @@
 #!/bin/bash
 
-# Check if pool_validators.csv exists
-if [ ! -f "pool_validators.csv" ]; then
-  echo "File pool_validators.csv not found."
-  exit 1
-fi
-
-# Count lines excluding header and empty lines
-entry_count=$(awk 'NR > 1 && NF > 0' pool_validators.csv | wc -l)
-
-if [ "$entry_count" -eq 0 ]; then
-  echo "There are no validators in the pool_validators.csv"
-  exit 0
-fi
-
 # Prompt the user
 read -p "You are about to redistribute stake among the pool validators, Do you wish to continue? (y/n): " response
 

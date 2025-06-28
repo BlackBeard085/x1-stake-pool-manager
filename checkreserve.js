@@ -5,6 +5,28 @@ const { execSync } = require('child_process');
 const addToPoolPath = 'add_to_pool.txt';
 const configPath = 'config.json';
 const poolKeypairsPath = 'pool_keypairs.json';
+const poolValidatorsPath = 'pool_validators.csv';
+
+// Check if pool_validators.csv exists and has entries (excluding header and empty lines)
+if (fs.existsSync(poolValidatorsPath)) {
+    const csvContent = fs.readFileSync(poolValidatorsPath, 'utf8');
+    const lines = csvContent.split(/\r?\n/).filter(line => line.trim() !== '');
+    if (lines.length <= 1) {
+        // Only header or empty file
+        console.log('There are no validators in the pool_validators.csv');
+        process.exit(0);
+    }
+} else {
+    // If the file doesn't exist, treat as no validators
+    console.log('There are no validators in the pool_validators.csv');
+    process.exit(0);
+}
+
+// Check if add_to_pool.txt exists; if not, create it
+if (!fs.existsSync(addToPoolPath)) {
+    fs.writeFileSync(addToPoolPath, '', 'utf8');
+    console.log(`Created empty file: ${addToPoolPath}`);
+}
 
 // Step 1: Count entries in add_to_pool.txt
 const addToPoolContent = fs.readFileSync(addToPoolPath, 'utf8');
