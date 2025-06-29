@@ -114,3 +114,5 @@ add_to_pool.txt
    ```
 
 Replace the vote addresses of the validator vote account already in the pool.
+
+If the pool validators have already been staked to in the pool you will need to import the amount staked into the 'config.json' replacing the 'delegate' amount.
