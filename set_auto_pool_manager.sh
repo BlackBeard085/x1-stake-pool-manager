@@ -2,7 +2,12 @@
 
 # Define variables
 CRON_COMMENT="# Auto Pool Manager cron job"
-CRON_JOB="0 0 * * * cd ~/x1-stake-pool-manager && ./autopoolmanager.sh # Auto Pool Manager cron job"
+
+#testnet cron for every 30 mins
+CRON_JOB="*/30 * * * * cd ~/x1-stake-pool-manager && ./autopoolmanager.sh # Auto Pool Manager cron job"
+
+#mainnet cron for once per day
+#CRON_JOB="0 0 * * * cd ~/x1-stake-pool-manager && ./autopoolmanager.sh # Auto Pool Manager cron job" for mainnet
 
 # Function to add cron job
 add_cron() {
