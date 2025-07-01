@@ -109,7 +109,7 @@ echo "Each validator will receive an increase of: ${increase} XNT over the deleg
 # --- Determine if increasing all delegations is worth it ---
 if [ "$delegate_value_flag" = true ]; then
     # Delegate value is empty, zero, or '-'
-    echo -e "\nDelegate value is empty, zero, or '-'. It is worth increasing all delegations.\n"
+    echo -e "\nValidators have 0 stake. It is worth increasing all delegations.\n"
     echo -e "Increasing pool validator stake\n"
       ./increase_redistribute_logic.sh
     echo -e "\nStaking to new pool validators"
