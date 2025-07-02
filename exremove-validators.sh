@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 
 # Script to add new validators to a stake pool, given the stake pool keyfile and
-# a file listing validator vote account pubkeys with retry logic and success checks
+# a file listing validator vote account pubkeys with retry logic and logging of failures
 
 cd "$(dirname "$0")" || exit
 stake_pool_keyfile=$1
-validator_list=$2  # File containing validator vote account addresses, each will be added to the stake pool after creation
+validator_list=$2  # File containing validator vote account addresses
 
-add_validator_stakes () {
+# Log file for failed validators
+failed_log="failed_to_remove.log"
+
+# Clear previous log if exists
+> "$failed_log"
+
+remove_validator_stakes () {
   local stake_pool=$1
   local validator_list=$2
   local max_retries=5
@@ -35,6 +41,7 @@ add_validator_stakes () {
 
     if [ $success -eq 0 ]; then
       echo "Failed to remove validator after $max_retries attempts: $validator" >&2
+      echo "$validator" >> "$failed_log"
     fi
   done < "$validator_list"
 }
@@ -58,5 +65,7 @@ spl_stake_pool="$full_command"
 stake_pool_pubkey=$(solana-keygen pubkey "$stake_pool_keyfile")
 echo "Removing validator stake accounts from the pool with pubkey: $stake_pool_pubkey"
 
-# Call the function to add validators with retry logic
-add_validator_stakes "$stake_pool_pubkey" "$validator_list"
+# Call the function to add validators with retry logic and logging
+remove_validator_stakes "$stake_pool_pubkey" "$validator_list"
+
+echo "Process completed. Failed validators logged in $failed_log"

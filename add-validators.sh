@@ -17,6 +17,7 @@ add_validator_stakes () {
   local stake_pool=$1
   local validator_list=$2
   local max_retries=5
+  local max_retry_later=7
 
   while read -r validator
   do
@@ -67,5 +68,44 @@ echo "Adding validator stake accounts to the pool with pubkey: $stake_pool_pubke
 
 # Call the function to add validators with retry logic and logging
 add_validator_stakes "$stake_pool_pubkey" "$validator_list"
+
+# Retry failed validators up to 3 times
+if [ -f "$failed_log" ] && [ -s "$failed_log" ]; then
+  echo "Retrying failed validators up to $max_retry_later times..."
+  
+  # Read current failed validators
+  mapfile -t failed_validators < "$failed_log"
+  
+  # Clear the failed log before retrying
+  > "$failed_log"
+  
+  for validator in "${failed_validators[@]}"
+  do
+    attempt=1
+    success=0
+    while [ "$attempt" -le "$max_retry_later" ]; do
+      echo "Retry #$attempt for validator: $validator"
+      if "$spl_stake_pool" add-validator "$stake_pool_pubkey" "$validator"; then
+        echo "Successfully added validator: $validator on retry"
+        success=1
+        break
+      else
+        echo "Failed to add validator: $validator on retry attempt #$attempt" >&2
+        ((attempt++))
+        sleep 4
+      fi
+    done
+
+    if [ "$success" -eq 0 ]; then
+      # Append again if still failed
+      echo "$validator" >> "$failed_log"
+      echo "Validator $validator remains in failed list after retries."
+    else
+      echo "Validator $validator succeeded on retry and removed from failed list."
+    fi
+  done
+else
+  echo "No failed validators to retry."
+fi
 
 echo "Process completed. Failed validators logged in $failed_log"

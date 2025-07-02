@@ -26,7 +26,7 @@ spl_stake_pool="$full_command"
 
 # Set maximum retries
 max_retries=5
-max_retry_later=5
+max_retry_later=7
 
 decrease_stakes () {
   stake_pool_pubkey=$1
@@ -83,7 +83,7 @@ retry_failed_validators () {
       else
         echo "Failed to decrease stake for validator $validator on retry attempt $attempt"
         ((attempt++))
-        sleep 2
+        sleep 4
       fi
     done
 

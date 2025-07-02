@@ -42,7 +42,7 @@ while true; do
         3)
             echo "Staking to Pool Validators..."
             # Add your staking logic here
-            node checkreserve.js 
+            ./resync_check.sh 
             sleep 5
             echo -e "\nUpdating pool." 
             ./update.sh 
