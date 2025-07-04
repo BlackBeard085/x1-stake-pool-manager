@@ -76,5 +76,31 @@ else
     log "Auto Pool manager complete"
   else
     log "Epoch in config.json is already up-to-date: $EXISTING_EPOCH"
+    log "Checking failures adding/removing validators and increasing/decreasing validator stake"
+
+# Check if failed_to_remove.log has entries
+if [ -s failed_to_remove.log ]; then
+  echo "Entries found in failed_to_remove.log. Running remove-validators.sh..."
+  ./remove-validators.sh
+fi
+
+# Check if failed_to_add.log has entries
+if [ -s failed_to_add.log ]; then
+  echo "Entries found in failed_to_add.log. Running add-validators.sh..."
+  ./add-validators.sh
+fi
+
+# Check if failed_to_increase_stake.txt has entries
+if [ -s failed_to_increase_stake.txt ]; then
+  echo "Entries found in failed_to_increase_stake.txt. Running rebalance.sh..."
+  ./rebalance.sh
+fi
+
+# Check if failed_to_decrease_stake.txt has entries
+if [ -s failed_to_decrease_stake.txt ]; then
+  echo "Entries found in failed_to_decrease_stake.txt. Running reduce_rebalance.sh..."
+  ./reduce_rebalance.sh
+fi
+
   fi
 fi
