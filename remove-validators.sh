@@ -96,7 +96,7 @@ retry_failed_validators () {
       else
         echo "Failed to remove validator: $validator on retry attempt #$attempt" >&2
         ((attempt++))
-        sleep 4
+        sleep 2
       fi
     done
 

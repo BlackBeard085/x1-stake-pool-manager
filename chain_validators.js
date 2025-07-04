@@ -3,7 +3,7 @@ const fs = require('fs');
 const { exec } = require('child_process');
 
 // Helper function for retries
-async function retryOperation(operation, retries = 3, delayMs = 1000) {
+async function retryOperation(operation, retries = 10, delayMs = 3000) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await operation();

@@ -75,7 +75,8 @@ remove_cron() {
     (crontab -l 2>/dev/null | grep -v "$CRON_COMMENT") | crontab -
     echo "Auto Pool Manager has been turned OFF."
     # Optional: resync pool
-    # echo -e "\nResyncing pool"
+    echo -e "\nResyncing pool using Option 3.Stake to Pool Validators\n"
+    sleep 5
     # ./stake_validators.sh > /dev/null
 }
 

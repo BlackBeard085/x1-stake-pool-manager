@@ -84,7 +84,7 @@ retry_failed_validators () {
       else
         echo "Failed to increase stake for validator $validator on retry attempt $attempt"
         ((attempt++))
-        sleep 4
+        sleep 2
       fi
     done
 

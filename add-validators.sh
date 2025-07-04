@@ -92,7 +92,7 @@ if [ -f "$failed_log" ] && [ -s "$failed_log" ]; then
       else
         echo "Failed to add validator: $validator on retry attempt #$attempt" >&2
         ((attempt++))
-        sleep 4
+        sleep 2
       fi
     done
 
