@@ -7,6 +7,10 @@ cd "$(dirname "$0")" || exit
 stake_pool_keyfile=$1
 validator_list=$2  # File containing validator vote account addresses
 
+# Global retry limits
+max_retries=5
+max_retry_later=7
+
 # Log file for failed validators
 failed_log="failed_to_remove.log"
 
@@ -16,8 +20,8 @@ failed_log="failed_to_remove.log"
 remove_validator_stakes () {
   local stake_pool=$1
   local validator_list=$2
-  local max_retries=5
-  local max_retry_later=7
+  #local max_retries=5
+  #local max_retry_later=7
 
   while read -r validator
   do

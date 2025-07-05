@@ -15,3 +15,7 @@ amend_stake_accounts.txt
 failed_to_increase_stake.txt
 failed_to_decrease_stake.txt
 auto_pool_manager.log
+resolve_failed_to_remove.log
+resolve_failed_to_add.log
+resolve_failed_to_increase_stake.txt
+resolve_failed_to_decrease_stake.txt
