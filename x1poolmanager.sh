@@ -23,6 +23,7 @@ while true; do
     echo "8. Set Parameters"
     echo "9. Connect Pool"
     echo "10. Setup Auto Pool Manager"
+    echo "11. Resolve failures"
     echo "0. Exit"
     read -p "Enter your choice (0-10): " choice
     echo
@@ -113,6 +114,10 @@ while true; do
        10)
             echo "Opening Auto Pool Manager Setting"
             ./set_auto_pool_manager.sh
+            ;;
+       11)
+            echo "Resolving failed adding/removing validators and increasing/decreasing validator stakes"
+            ./resolve_failures.sh
             ;;
         0)
             break

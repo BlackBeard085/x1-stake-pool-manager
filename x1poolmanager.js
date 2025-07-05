@@ -7,7 +7,7 @@ const poolKeypairsPath = 'pool_keypairs.json';
 const configPath = 'config.json';
 
 async function main() {
-  console.log("X1 Stake Pool Manager v0.0.12 - Jack The Ripper By BlackBeard_85\n");
+  console.log("X1 Stake Pool Manager v0.0.13 - Jack The Ripper By BlackBeard_85\n");
 
   // Read config.json to get min reserve and delegate
   let minReserveBalance = null;
