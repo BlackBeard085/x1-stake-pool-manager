@@ -100,6 +100,12 @@ if [ -z "$redistribution_amount" ] || [ "$redistribution_amount" == "null" ]; th
     exit 1
 fi
 
+# Check if per validator amount is less than 2
+if (( $(echo "$redistribution_amount < 2" | bc -l) )); then
+    echo -e "\nStake per validator is less than 2. Please fund the pool or adjust vetting requirements to reduce pool validators. Minimum stake per validator is 2 XNT"
+    exit 0
+fi
+
 # Calculate increase over delegate
 increase=$(awk "BEGIN {printf \"%.2f\", $redistribution_amount - $delegate}")
 

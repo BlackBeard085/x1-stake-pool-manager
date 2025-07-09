@@ -46,10 +46,10 @@ if [ "$comparison" -eq 1 ]; then
   sleep 3
 else
   echo "Insufficient balance to withdraw the requested amount. Initiating withdrawl"
-  sleep 1
+  sleep3
 
-  # Update initiatedWithdraw to "yes" in config.json without affecting other entries
-  jq '.initiatedWithdraw = "yes"' "$CONFIG_FILE" > tmp_config.json && mv tmp_config.json "$CONFIG_FILE"
+  # Update initiatedWithdraw to "yes" in config.json
+  jq 'if has("initiatedWithdraw") then . else . + {"initiatedWithdraw":"yes"} end' "$CONFIG_FILE" > tmp_config.json && mv tmp_config.json "$CONFIG_FILE"
 
   echo "initiating withdrawal"
 
@@ -112,13 +112,12 @@ else
 
   echo "redistributionAmount set to: $redistributionAmount"
   echo "requestedWithdrawal set to: $withdrawal_amount"
-
-  # List validators that require their stakes amending
-  node amend_stake_accounts.js
-  # Action the reduction in stake
-  ./decrease_stake_validators.sh
-  # Amend the new delegation amount to future validator shortlists
-  ./new_delegate_amount.sh
-  # Clear validator list that had stakes reduced
-  > amend_stake_accounts.txt
+   #list validators that require their stakes amending
+    node amend_stake_accounts.js
+    #Action the reduction in stake
+    ./decrease_stake_validators.sh
+    #ammend the new delegation amount to future validator shortlists
+    ./new_delegate_amount.sh
+    #clear validator list that had stakes reduced
+    > amend_stake_accounts.txt
 fi

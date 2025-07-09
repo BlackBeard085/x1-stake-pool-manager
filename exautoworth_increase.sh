@@ -112,15 +112,15 @@ if [ "$delegate_value_flag" = true ]; then
     echo -e "\nValidators have 0 stake. It is worth increasing all delegations.\n"
     echo -e "Increasing pool validator stake\n"
       ./increase_redistribute_logic.sh
-    echo -e "\nStaking to new pool validators"
-       ./stake_validators.sh
+#    echo -e "\nStaking to new pool validators"
+#       ./stake_validators.sh
 elif (( $(echo "$increase > 1.00" | bc -l) )); then
     echo -e "\nIt is worth increasing all delegations\n"
     echo -e "Increasing pool validator stake\n"
     ./increase_redistribute_logic.sh
-    echo -e "\nStaking to new pool validators"
-    ./stake_validators.sh
+    echo -e "\nIncreased stake to existing pool validators"
+#    ./stake_validators.sh
 else
     echo "It is not worth increasing all delegations, can continue to delegate only to new pool entered validators"
-    ./stake_validators.sh
+#    ./stake_validators.sh
 fi

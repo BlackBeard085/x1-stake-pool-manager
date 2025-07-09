@@ -32,7 +32,7 @@ const counts = files.map(file => ({
 }));
 
 // Print header
-console.log('Failures\n');
+console.log('\n                    Failures');
 
 console.log('| adding | removal | increasing | decreasing |');
 

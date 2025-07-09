@@ -3,6 +3,19 @@
 # Paths to your JSON files
 POOL_KEYPAIRS_FILE="pool_keypairs.json"
 CONFIG_FILE="config.json"
+REDISTRIBUTE_FILE="redistribute.json"
+
+# Check redistributionAmount in redistribute.json
+REDISTRIBUTE_AMOUNT=$(jq -r '.redistributionAmount' "$REDISTRIBUTE_FILE")
+if [ -z "$REDISTRIBUTE_AMOUNT" ] || [ "$REDISTRIBUTE_AMOUNT" == "null" ]; then
+  echo "Error: Could not find 'redistributionAmount' in $REDISTRIBUTE_FILE"
+  exit 1
+fi
+
+if (( $(echo "$REDISTRIBUTE_AMOUNT < 2" | bc -l) )); then
+  echo "Redistribution stake per validator is less than 2. Please fund the pool or adjust vetting requirements to reduce pool validators. Minimum stake per validator is 2 XNT."
+  exit 1
+fi
 
 # Extract the stakePoolKeypair path directly from the JSON object
 STAKE_POOL_KEYPAIR=$(jq -r '.stakePoolKeypair' "$POOL_KEYPAIRS_FILE")
@@ -25,4 +38,4 @@ ADD_TO_POOL_FILE="add_to_pool.txt"
 ./rebalance.sh "$STAKE_POOL_KEYPAIR" "$ADD_TO_POOL_FILE" "$AMOUNT_FOR_EACH_VALIDATOR"
 
 echo -e "\nStaked to new validators, clearing add validator list"
-> add_to_pool.txt
+> "$ADD_TO_POOL_FILE"

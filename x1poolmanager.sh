@@ -7,6 +7,8 @@ while true; do
     node x1poolmanager.js
     node epoch-info.js
     node failedcount.js
+    echo ""
+    ./stake_under_2.sh
 
     # Add a blank line for readability
     echo
@@ -76,6 +78,8 @@ while true; do
             > add_to_pool.txt
             echo -e "\nSetting delegated amount to 0"
             ./replace_delegate.sh
+            # Update redistributionAmount to "-"
+            jq '.redistributionAmount = "-" ' redistribute.json > tmp_redistribute.json && mv tmp_redistribute.json redistribute.json
             ;;
         6)
             echo -e "\nChoose a subcommand:"

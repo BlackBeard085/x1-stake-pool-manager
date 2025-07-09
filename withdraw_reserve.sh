@@ -54,7 +54,7 @@ if [ -z "$reserve_value" ] || [ "$reserve_value" == "null" ]; then
 fi
 
 # Calculate available balance (balance minus reserve)
-available_balance=$(echo "$balance_value - $reserve_value" | bc)
+available_balance=$(echo "$balance_value - ($reserve_value * 0.4)" | bc)
 
 # Calculate remaining after withdrawal
 remaining=$(echo "$available_balance - $amount" | bc)
