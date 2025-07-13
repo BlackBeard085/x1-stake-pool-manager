@@ -4,6 +4,7 @@
 
 while true; do
     # Run the commands before showing options
+    ./update.sh > /dev/null 2>&1
     node x1poolmanager.js
     node epoch-info.js
     node failedcount.js
@@ -22,8 +23,8 @@ while true; do
     echo "5. Unstake All Validators"
     echo "6. Withdraw from Pool"
     echo "7. Update Pool Data"
-    echo "8. Set Parameters"
-    echo "9. Connect Pool"
+    echo "8. Set Parameters/Pool"
+    echo "9. List Pool Data & Validators"
     echo "10. Setup Auto Pool Manager"
     echo "11. Resolve failures"
     echo "0. Exit"
@@ -76,6 +77,8 @@ while true; do
             > pool_validators.csv
             > staking_shortlist.csv
             > add_to_pool.txt
+            > failed_to_decrease_stake.txt 
+            > failed_to_increase_stake.txt 
             echo -e "\nSetting delegated amount to 0"
             ./replace_delegate.sh
             # Update redistributionAmount to "-"
@@ -106,14 +109,31 @@ while true; do
             ./update.sh
             ;;
         8)
-            echo "Setting Parameters..."
-            # Add your set parameters logic here
-            ./set_config.sh
-            ;;
+                echo -e "\nChoose a subcommand:"
+                echo -e "1. Set Vetting Parameters"
+                echo -e "2. Connect Pool"
+                read -p "Enter your choice [1-2]: " update_choice
+                case $update_choice in
+                    1)
+                      echo "Setting Parameters..."
+                      # Add your set parameters logic here
+                      ./set_config.sh
+                      ;;
+                    2)
+                      echo "Connecting Pool..."
+                      # Add your connect pool logic here
+                      ./get_pool_keypairs.sh
+                      echo -e "\nImporting Pool"
+                       node import_pool_val.js > /dev/null 2>&1
+                      ;;
+                    *)
+                        echo -e "\nInvalid subcommand choice. Returning to main menu.\n"
+                        ;;
+                esac
+                      ;;
         9)
-            echo "Connecting Pool..."
-            # Add your connect pool logic here
-            ./get_pool_keypairs.sh
+            echo "Listing pool validators..."
+            ./list_pool_validators.sh
             ;;
        10)
             echo "Opening Auto Pool Manager Setting"

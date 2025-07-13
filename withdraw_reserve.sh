@@ -53,8 +53,8 @@ if [ -z "$reserve_value" ] || [ "$reserve_value" == "null" ]; then
   exit 1
 fi
 
-# Calculate available balance (balance minus reserve)
-available_balance=$(echo "$balance_value - ($reserve_value * 0.4)" | bc)
+# Calculate available balance (balance minus reserve * 0.6)
+available_balance=$(echo "$balance_value - ($reserve_value * 0.6)" | bc)
 
 # Calculate remaining after withdrawal
 remaining=$(echo "$available_balance - $amount" | bc)
@@ -62,22 +62,34 @@ remaining=$(echo "$available_balance - $amount" | bc)
 # Check if withdrawal is possible (remaining >= 0.1 SOL)
 comparison=$(echo "$remaining >= 0.1" | bc)
 if [ "$comparison" -eq 1 ]; then
-  echo "Processing withdrawl."
+  echo "Processing withdrawal."
   sleep 3
 else
-  echo "Insufficient balance to withdraw the requested amount and keeping requested minimum reserve. Initaiate a withdrawl for larger amounts or request a smaller amount of funds to withdraw."
+  echo "Insufficient balance to withdraw the requested amount and keep the minimum reserve. Initiate a withdrawal for larger amounts or request a smaller amount."
   sleep 3
   exit 1
 fi
 
 # --- End of balance check ---
 
+# Handle funding_authority: if empty, derive from solana address
+if [ -z "$funding_authority" ] || [ "$funding_authority" == "null" ]; then
+    # Derive funding authority from keypair if available
+    # You might want to specify a keypair path here if needed
+    # For now, fallback to solana address
+    funding_authority=$(solana address)
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to derive funding authority address."
+        exit 1
+    fi
+fi
+
 # Construct and run the withdraw command
 "$expanded_command" withdraw-sol "$pool_address" "$funding_authority" "$amount"
 
 # Check if withdrawal was successful
 if [ $? -eq 0 ]; then
-    echo "Withdrawal successful. Updating initiatWithdraw to 'no' in $CONFIG_FILE."
+    echo "Withdrawal successful. Updating initiatedWithdraw to 'no' in $CONFIG_FILE."
 
     # Use jq to update initiatedWithdraw to "no" without affecting other data
     tmp_file=$(mktemp)

@@ -21,11 +21,5 @@ fi
 # Get the pool address from the stake pool keypair
 pool_address=$(solana address -k "$stakePoolKeypair")
 
-# Determine whether to include the --funding-authority flag
-if [ -z "$fundingAuthorityKeypair" ] || [ "$fundingAuthorityKeypair" = "null" ]; then
-  # No funding authority specified
-  "$splStakePoolCommand" deposit-sol "$pool_address" "$amount"
-else
-  # Funding authority specified
-  "$splStakePoolCommand" deposit-sol --funding-authority "$fundingAuthorityKeypair" "$pool_address" "$amount"
-fi
+# Execute the command
+"$splStakePoolCommand" deposit-sol --funding-authority "$fundingAuthorityKeypair" "$pool_address" "$amount"

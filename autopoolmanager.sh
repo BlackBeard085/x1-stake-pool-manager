@@ -126,6 +126,7 @@ else
     sleep 5
     
     log "Updating pool with top performing validators"
+    node import_pool_val.js > /dev/null 2>&1
     ./update_pool_validators.sh 2>&1 | tee -a "$LOG_FILE"
     
     sleep 5

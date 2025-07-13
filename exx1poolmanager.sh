@@ -1,11 +1,15 @@
 #!/bin/bash
 
 ./checkpoolcount.sh
+node import_pool_val.js > /dev/null 2>&1
 
 while true; do
     # Run the commands before showing options
     node x1poolmanager.js
     node epoch-info.js
+    node failedcount.js
+    echo ""
+    ./stake_under_2.sh
 
     # Add a blank line for readability
     echo
@@ -18,11 +22,13 @@ while true; do
     echo "4. Redistribute Stake"
     echo "5. Unstake All Validators"
     echo "6. Withdraw from Pool"
-    echo "7. Update Pool"
+    echo "7. Update Pool Data"
     echo "8. Set Parameters"
     echo "9. Connect Pool"
+    echo "10. Setup Auto Pool Manager"
+    echo "11. Resolve failures"
     echo "0. Exit"
-    read -p "Enter your choice (0-9): " choice
+    read -p "Enter your choice (0-10): " choice
     echo
 
     case "$choice" in
@@ -32,16 +38,17 @@ while true; do
             ./fundpool.sh
             ;;
         2)
-            echo "Updating Pool, Prepool, and Shortlist..."
+            echo "Ensuring new validators delegated before updating pool"
             # Add your update pool validators logic here
-            ./update_pool_validators.sh
+            ./check_add_list.sh
             
             ;;
         3)
             echo "Staking to Pool Validators..."
             # Add your staking logic here
-            node checkreserve.js 
+            ./resync_check.sh 
             sleep 5
+            echo -e "\nUpdating pool." 
             ./update.sh 
             ;;
         4)
@@ -69,14 +76,33 @@ while true; do
             ./update.sh 
             > pool_validators.csv
             > staking_shortlist.csv
+            > add_to_pool.txt
+            > failed_to_decrease_stake.txt 
+            > failed_to_increase_stake.txt 
             echo -e "\nSetting delegated amount to 0"
             ./replace_delegate.sh
+            # Update redistributionAmount to "-"
+            jq '.redistributionAmount = "-" ' redistribute.json > tmp_redistribute.json && mv tmp_redistribute.json redistribute.json
             ;;
         6)
-            echo "Withdrawing from Pool..."
-            # Add your withdrawal logic here
-            ./withdraw_reserve.sh
-            ;;
+            echo -e "\nChoose a subcommand:"
+                echo -e "1. Make Withdrawl"
+                echo -e "2. Initiate Withdrawl"
+                read -p "Enter your choice [1-2]: " update_choice
+
+                case $update_choice in
+                    1)
+                         ./withdraw_reserve.sh
+                        ;;
+                    2)
+                        ./initiate_withdraw.sh
+                        ;;
+                    *)
+                        echo -e "\nInvalid subcommand choice. Returning to main menu.\n"
+                        ;;
+                esac
+                ;;
+
         7)
             echo "Updating Pool data..."
             # Add your update Pool logic here
@@ -91,6 +117,14 @@ while true; do
             echo "Connecting Pool..."
             # Add your connect pool logic here
             ./get_pool_keypairs.sh
+            ;;
+       10)
+            echo "Opening Auto Pool Manager Setting"
+            ./set_auto_pool_manager.sh
+            ;;
+       11)
+            echo "Resolving failed adding/removing validators and increasing/decreasing validator stakes"
+            ./resolve_failures.sh
             ;;
         0)
             break

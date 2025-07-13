@@ -81,5 +81,5 @@ if (postDelegationReserve > reserveConfig) {
         process.exit(1);
     }
 } else {
-    console.log(`Increase reserve before delegations or redistribute stake: Post delegation reserve (${postDelegationReserve} SOL) is less than minimum set reserve (${reserveConfig} SOL).`);
+    console.log(`Increase reserve before delegations or redistribute stake: Post delegation reserve (${postDelegationReserve} SOL) is less than minimum set reserve (${reserveConfig} SOL). If you have already redistributed stake please await next epoch and update pool data before staking to awaiting validators.`);
 }

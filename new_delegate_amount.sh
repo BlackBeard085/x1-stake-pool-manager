@@ -25,4 +25,4 @@ fi
 # Update the delegate value as a number (without quotes)
 jq --argjson new_delegate "$redistribution_amount" '.delegate = $new_delegate' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
 
-echo "Updated 'delegate' in $CONFIG_FILE with numeric value: $redistribution_amount"
+echo "Updated 'delegate' in $CONFIG_FILE with new delegation amount per validator: $redistribution_amount"
