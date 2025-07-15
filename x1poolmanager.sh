@@ -20,7 +20,7 @@ while true; do
     echo "2. Update Pool Validators"
     echo "3. Stake to Pool Validators"
     echo "4. Redistribute Stake"
-    echo "5. Unstake All Validators"
+    echo "5. Remove All Validators"
     echo "6. Withdraw from Pool"
     echo "7. Update Pool Data"
     echo "8. Set Parameters/Pool"

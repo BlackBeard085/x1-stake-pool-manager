@@ -2,6 +2,20 @@ const https = require('https');
 const fs = require('fs');
 const { exec } = require('child_process');
 
+// Helper function for retries
+async function retryOperation(operation, retries = 10, delayMs = 3000) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await operation();
+    } catch (err) {
+      if (attempt === retries) {
+        throw err;
+      }
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+  }
+}
+
 // Define options for getSlot RPC
 const options = {
   hostname: 'rpc.testnet.x1.xyz', // replace with your RPC URL
@@ -11,10 +25,10 @@ const options = {
   headers: { 'Content-Type': 'application/json' }
 };
 
-// Function to fetch current chain slot
-function getChainSlot() {
+// Function to fetch current chain slot with retry
+async function getChainSlot() {
   const data = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getSlot" });
-  return new Promise((resolve, reject) => {
+  return retryOperation(() => new Promise((resolve, reject) => {
     const req = https.request({ ...options, headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } }, (res) => {
       let resData = '';
       res.on('data', chunk => resData += chunk);
@@ -30,20 +44,20 @@ function getChainSlot() {
     req.on('error', (e) => reject(e));
     req.write(data);
     req.end();
-  });
+  }));
 }
 
-// Helper to run shell commands
+// Helper to run shell commands with retry
 function runCommand(cmd) {
-  return new Promise((resolve) => {
+  return retryOperation(() => new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {
       if (error) {
-        resolve('');
+        reject(error);
       } else {
         resolve(stdout);
       }
     });
-  });
+  }));
 }
 
 // Fetch second epoch credits
@@ -98,24 +112,22 @@ async function getValidatorLatency(votePubkey) {
 
 // Fetch validator skip rate
 function getValidatorSkipRate(votePubkey) {
-  return new Promise((resolve) => {
-    runCommand(`solana validators | grep ${votePubkey} | awk '{print $11}'`)
-      .then(output => {
-        const outTrim = output.trim();
-        if (
-          outTrim === '' ||
-          outTrim.includes('N/A') ||
-          outTrim.includes('-')
-        ) {
-          resolve('N/A');
-        } else {
-          resolve(outTrim);
-        }
-      });
-  });
+  return runCommand(`solana validators | grep ${votePubkey} | awk '{print $11}'`)
+    .then(output => {
+      const outTrim = output.trim();
+      if (
+        outTrim === '' ||
+        outTrim.includes('N/A') ||
+        outTrim.includes('-')
+      ) {
+        return 'N/A';
+      } else {
+        return outTrim;
+      }
+    });
 }
 
-// Fetch vote account info and calculate average credits
+// Fetch vote account info and calculate average credits with retry
 async function getAverageCredits(votePubkey) {
   const output = await runCommand(`solana vote-account ${votePubkey}`);
   const creditsValues = [];
@@ -138,9 +150,9 @@ async function getAverageCredits(votePubkey) {
   return (sum / creditsValues.length).toFixed(2);
 }
 
-// Fetch vote accounts data
+// Fetch vote accounts data with retry
 function fetchVoteAccounts() {
-  return new Promise((resolve, reject) => {
+  return retryOperation(() => new Promise((resolve, reject) => {
     const req = https.request({ ...options, headers: { 'Content-Type': 'application/json' } }, (res) => {
       let responseData = '';
       res.on('data', (chunk) => { responseData += chunk; });
@@ -156,7 +168,7 @@ function fetchVoteAccounts() {
     req.on('error', (e) => reject(e));
     req.write(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getVoteAccounts" }));
     req.end();
-  });
+  }));
 }
 
 // Read existing config.json or initialize empty object

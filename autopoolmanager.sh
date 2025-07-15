@@ -125,6 +125,16 @@ else
     
     sleep 5
     
+    #Check if staking new validators was successful
+    FAILED_INCREASE_STAKE_ENTRIES=$(test -s failed_to_increase_stake.txt && echo "yes" || echo "no")
+      if [ "$FAILED_INCREASE_STAKE_ENTRIES" = "yes" ]; then
+        log "Entries found in failed_to_increase_stake.txt. Running rebalance.sh..."
+        mv failed_to_increase_stake.txt add_to_pool.txt
+        ./stake_validators.sh  2>&1 | tee -a "$LOG_FILE"
+        exit 0
+      else
+        log "All new validators staked successfully, continuing to update validators"
+      fi
     log "Updating pool with top performing validators"
     node import_pool_val.js > /dev/null 2>&1
     ./update_pool_validators.sh 2>&1 | tee -a "$LOG_FILE"

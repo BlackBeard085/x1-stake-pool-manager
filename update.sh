@@ -42,7 +42,7 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
   
   # Check if command succeeded
   if [ $? -eq 0 ]; then
-    echo "Update succeeded."
+    echo ""
     break
   else
     echo "Update failed."
