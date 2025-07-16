@@ -288,7 +288,7 @@ function writeConfig(config) {
         }
 
         // Check config.delegate and update if 0
-        if (config.hasOwnProperty('delegate')) {
+        if (config.hasOwnProperty('delegate') && config.delegate === 0) {
           if (majorityBalanceFinal !== null) {
             const newDelegateValue = parseFloat(majorityBalanceFinal).toFixed(2);
             config.delegate = parseFloat(newDelegateValue);
