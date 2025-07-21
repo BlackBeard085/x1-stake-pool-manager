@@ -62,52 +62,64 @@ function runCommand(cmd) {
 
 // Fetch second epoch credits
 async function getSecondEpochCredits(voteAddress) {
-  const output = await runCommand(`solana vote-account ${voteAddress}`);
-  const lines = output.split('\n');
-  const creditsLines = lines.filter(line => line.includes('credits/max credits'));
-  if (creditsLines.length < 2) return '0';
-  const secondLine = creditsLines[1];
-  const match = secondLine.match(/credits\/max credits:\s*(\d+)\s*\/\s*\d+/);
-  return match && match[1] ? match[1] : '0';
+  try {
+    const output = await runCommand(`solana vote-account ${voteAddress}`);
+    const lines = output.split('\n');
+    const creditsLines = lines.filter(line => line.includes('credits/max credits'));
+    if (creditsLines.length < 2) return '0';
+    const secondLine = creditsLines[1];
+    const match = secondLine.match(/credits\/max credits:\s*(\d+)\s*\/\s*\d+/);
+    return match && match[1] ? match[1] : '0';
+  } catch {
+    return null; // indicate failure
+  }
 }
 
 // Fetch total credits
 async function getTotalCredits(voteAddress) {
-  const output = await runCommand(`solana vote-account ${voteAddress}`);
-  let totalCredits = 0;
-  const lines = output.split('\n');
-  for (const line of lines) {
-    if (line.startsWith('Credits:')) {
-      const parts = line.trim().split(/\s+/);
-      const credits = parseInt(parts[1], 10);
-      if (!isNaN(credits)) totalCredits += credits;
+  try {
+    const output = await runCommand(`solana vote-account ${voteAddress}`);
+    let totalCredits = 0;
+    const lines = output.split('\n');
+    for (const line of lines) {
+      if (line.startsWith('Credits:')) {
+        const parts = line.trim().split(/\s+/);
+        const credits = parseInt(parts[1], 10);
+        if (!isNaN(credits)) totalCredits += credits;
+      }
     }
+    return totalCredits.toString();
+  } catch {
+    return null;
   }
-  return totalCredits.toString();
 }
 
 // Fetch recent votes and compute average latency
 async function getValidatorLatency(votePubkey) {
-  const output = await runCommand(`solana vote-account ${votePubkey}`);
-  const latencies = [];
-  const lines = output.split('\n');
-  let inRecentVotes = false;
-  for (let line of lines) {
-    if (line.includes('Recent Votes (using 31/31 entries):')) {
-      inRecentVotes = true;
-      continue;
+  try {
+    const output = await runCommand(`solana vote-account ${votePubkey}`);
+    const latencies = [];
+    const lines = output.split('\n');
+    let inRecentVotes = false;
+    for (let line of lines) {
+      if (line.includes('Recent Votes (using 31/31 entries):')) {
+        inRecentVotes = true;
+        continue;
+      }
+      if (inRecentVotes) {
+        if (line.trim() === '') break;
+        const match = line.match(/\(latency (\d+)\)/);
+        if (match && match[1]) latencies.push(parseInt(match[1], 10));
+      }
     }
-    if (inRecentVotes) {
-      if (line.trim() === '') break;
-      const match = line.match(/\(latency (\d+)\)/);
-      if (match && match[1]) latencies.push(parseInt(match[1], 10));
-    }
+    if (latencies.length === 0) return 'N/A';
+    const count = latencies.length;
+    const startIdx = Math.max(0, count - 31);
+    const sum = latencies.slice(startIdx).reduce((a, b) => a + b, 0);
+    return (sum / (count - startIdx)).toFixed(2);
+  } catch {
+    return null;
   }
-  if (latencies.length === 0) return 'N/A';
-  const count = latencies.length;
-  const startIdx = Math.max(0, count - 31);
-  const sum = latencies.slice(startIdx).reduce((a, b) => a + b, 0);
-  return (sum / (count - startIdx)).toFixed(2);
 }
 
 // Fetch validator skip rate
@@ -124,30 +136,35 @@ function getValidatorSkipRate(votePubkey) {
       } else {
         return outTrim;
       }
-    });
+    })
+    .catch(() => 'N/A');
 }
 
-// Fetch vote account info and calculate average credits with retry
+// Fetch average credits with retry
 async function getAverageCredits(votePubkey) {
-  const output = await runCommand(`solana vote-account ${votePubkey}`);
-  const creditsValues = [];
-  let skipFirst = true;
-  const lines = output.split('\n');
-  for (const line of lines) {
-    if (line.includes('credits/max credits:')) {
-      if (skipFirst) {
-        skipFirst = false; // skip first occurrence
-        continue;
-      }
-      const match = line.match(/credits\/max credits:\s*(\d+)/);
-      if (match && match[1]) {
-        creditsValues.push(parseInt(match[1], 10));
+  try {
+    const output = await runCommand(`solana vote-account ${votePubkey}`);
+    const creditsValues = [];
+    let skipFirst = true;
+    const lines = output.split('\n');
+    for (const line of lines) {
+      if (line.includes('credits/max credits:')) {
+        if (skipFirst) {
+          skipFirst = false; // skip first occurrence
+          continue;
+        }
+        const match = line.match(/credits\/max credits:\s*(\d+)/);
+        if (match && match[1]) {
+          creditsValues.push(parseInt(match[1], 10));
+        }
       }
     }
+    if (creditsValues.length === 0) return null;
+    const sum = creditsValues.reduce((a, b) => a + b, 0);
+    return (sum / creditsValues.length).toFixed(2);
+  } catch {
+    return null;
   }
-  if (creditsValues.length === 0) return 'N/A';
-  const sum = creditsValues.reduce((a, b) => a + b, 0);
-  return (sum / creditsValues.length).toFixed(2);
 }
 
 // Fetch vote accounts data with retry
@@ -171,22 +188,23 @@ function fetchVoteAccounts() {
   }));
 }
 
-// Read existing config.json or initialize empty object
-function readConfig() {
-  if (fs.existsSync('config.json')) {
-    const raw = fs.readFileSync('config.json');
-    try {
-      return JSON.parse(raw);
-    } catch (e) {
-      return {};
+// Read existing CSV or initialize headers
+function readExistingCSV() {
+  if (fs.existsSync('chain_validators.csv')) {
+    const content = fs.readFileSync('chain_validators.csv', 'utf-8');
+    const lines = content.split('\n');
+    if (lines.length > 0 && lines[0].startsWith('Vote Pubkey')) {
+      return lines;
     }
   }
-  return {};
+  // Return headers if file doesn't exist or invalid
+  const header = 'Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency';
+  return [header];
 }
 
-// Save updated config.json
-function saveConfig(obj) {
-  fs.writeFileSync('config.json', JSON.stringify(obj, null, 2));
+// Save CSV lines
+function saveCSV(lines) {
+  fs.writeFileSync('chain_validators.csv', lines.join('\n'));
 }
 
 // Main execution
@@ -203,17 +221,29 @@ async function main() {
     const delinquentCount = result.delinquent ? result.delinquent.length : 0;
     const totalValidators = currentCount + delinquentCount;
 
-    // 4. Read existing config, update entries
-    const config = readConfig();
+    // 4. Read existing CSV
+    const existingLines = readExistingCSV();
+    const header = existingLines[0];
+    const existingData = {};
+    // Parse existing data into a map for quick lookup
+    for (let i = 1; i < existingLines.length; i++) {
+      const row = existingLines[i].split(',');
+      const votePubkey = row[0];
+      existingData[votePubkey] = row; // store array of fields
+    }
 
-    // Update relevant entries
+    // 5. Update config.json
+    const config = {};
+    if (fs.existsSync('config.json')) {
+      try {
+        Object.assign(config, JSON.parse(fs.readFileSync('config.json')));
+      } catch {}
+    }
     config.chainSlot = chainSlot;
     config.totalValidators = totalValidators;
     config.currentValidators = currentCount;
     config.delinquentValidators = delinquentCount;
-
-    // Save back the config
-    saveConfig(config);
+    fs.writeFileSync('config.json', JSON.stringify(config, null, 2));
     console.log('Updated config.json with chain slot and validator counts');
 
     const allAccounts = [
@@ -221,44 +251,64 @@ async function main() {
       ...(result.delinquent || []).map(acc => ({ ...acc, status: 'delinquent' }))
     ];
 
-    const rows = [];
+    const newLines = [header];
 
-    // 5. Process all vote accounts
+    // 6. Process all vote accounts
     await Promise.all(allAccounts.map(async (acc) => {
       const { votePubkey, nodePubkey, activatedStake, lastVote } = acc;
       const { commission = 'N/A' } = acc;
 
-      const [secondEpochCredits, totalCredits, latency] = await Promise.all([
+      // Fetch data, fallback to existing if fail
+      const [
+        secondEpochCredits,
+        totalCredits,
+        latency,
+        averageCredits,
+        skipRate
+      ] = await Promise.all([
         getSecondEpochCredits(votePubkey),
         getTotalCredits(votePubkey),
-        getValidatorLatency(votePubkey)
+        getValidatorLatency(votePubkey),
+        getAverageCredits(votePubkey),
+        getValidatorSkipRate(votePubkey)
       ]);
 
-      const averageCredits = await getAverageCredits(votePubkey);
-      const skipRate = await getValidatorSkipRate(votePubkey);
+      // Retrieve existing data if fetch failed
+      const existing = existingData[votePubkey] || [];
 
-      rows.push({
+      const getField = (fieldName, newValue) => {
+        if (newValue === null || newValue === undefined || newValue === 'N/A') {
+          // Keep existing if available
+          return existing.length ? existing[fieldNameToIndex(fieldName)] : 'N/A';
+        }
+        return newValue;
+      };
+
+      // Helper to get index of a field in CSV
+      function fieldNameToIndex(fieldName) {
+        const fields = header.split(',');
+        return fields.indexOf(fieldName);
+      }
+
+      const row = [
         votePubkey,
         nodePubkey,
         activatedStake,
         commission,
         lastVote,
-        secondEpochCredits,
-        totalCredits,
-        status: acc.status,
-        skipRate,
-        latency,
-        averageCredits
-      });
+        getField('Second Epoch Credits', secondEpochCredits),
+        getField('Total Credits', totalCredits),
+        getField('Average Credits', averageCredits),
+        acc.status,
+        getField('Skip Rate', skipRate),
+        getField('Latency', latency)
+      ];
+
+      newLines.push(row.join(','));
     }));
 
-    // 6. Write CSV
-    const header = 'Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency\n';
-    const csvContent = rows.map(r =>
-      `${r.votePubkey},${r.nodePubkey},${r.activatedStake},${r.commission},${r.lastVote},${r.secondEpochCredits},${r.totalCredits},${r.averageCredits},${r.status},${r.skipRate},${r.latency}`
-    ).join('\n');
-
-    fs.writeFileSync('chain_validators.csv', header + csvContent);
+    // 7. Save updated CSV
+    saveCSV(newLines);
     console.log('Data saved to chain_validators.csv');
 
   } catch (err) {
