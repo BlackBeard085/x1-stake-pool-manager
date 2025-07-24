@@ -47,7 +47,7 @@ function writeMapToCsv(map, csvFilePath) {
   return new Promise((resolve, reject) => {
     if (map.size === 0) {
       // Write only headers if empty
-      fs.writeFile(csvFilePath, 'Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency\n', 'utf8', err => {
+      fs.writeFile(csvFilePath, 'Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency,Validator Version\n', 'utf8', err => {
         if (err) reject(err);
         else resolve();
       });

@@ -1,5 +1,4 @@
 // pool_validators.js
-
 const fs = require('fs');
 const path = require('path');
 const csvParser = require('csv-parser');
@@ -24,17 +23,27 @@ const headers = [
   { id: 'Latency', title: 'Latency' },
 ];
 
-// Function to ensure pool_validators.csv exists
-function ensurePoolFile() {
-  if (!fs.existsSync(POOL_FILE)) {
-    // Create an empty CSV file with headers
+// Function to ensure pool_validators.csv exists and has headers
+async function ensurePoolFile() {
+  if (fs.existsSync(POOL_FILE)) {
+    // Check if file is empty
+    const stats = fs.statSync(POOL_FILE);
+    if (stats.size === 0) {
+      // File exists but is empty, write headers
+      const csvWriter = createObjectCsvWriter({
+        path: POOL_FILE,
+        header: headers,
+      });
+      await csvWriter.writeRecords([]); // write headers
+    }
+    // Else, assume headers present
+  } else {
+    // File doesn't exist, create with headers
     const csvWriter = createObjectCsvWriter({
       path: POOL_FILE,
       header: headers,
     });
-    return csvWriter.writeRecords([]); // Write empty array to create file
-  } else {
-    return Promise.resolve();
+    await csvWriter.writeRecords([]); // create file with headers
   }
 }
 
@@ -89,48 +98,42 @@ function readShortlist() {
 async function main() {
   try {
     await ensurePoolFile();
-
     const [stakedMap, shortlistEntries] = await Promise.all([
       readCsvToMap(POOL_FILE),
       readShortlist(),
     ]);
-
     // Read existing vote pubkeys from pool_validators.csv
     const stakedVotePubkeys = new Set(stakedMap.keys());
-
     // Prepare CSV writer for appending new entries
     const csvWriter = createObjectCsvWriter({
       path: POOL_FILE,
       header: headers,
       append: true,
     });
-
     // Prepare to write new vote pubkeys to add_to_pool.txt
     const addToPoolStream = fs.createWriteStream(ADD_TO_POOL_FILE, { flags: 'a' });
+    
+    let addedCount = 0; // Counter for added validators
 
     for (const entry of shortlistEntries) {
       const votePubkey = entry['Vote Pubkey'];
       if (!votePubkey) continue; // Skip if no vote pubkey
-
       if (!stakedVotePubkeys.has(votePubkey)) {
         // Add new entry to pool_validators.csv
         await csvWriter.writeRecords([entry]);
-
         // Append vote pubkey to add_to_pool.txt
         addToPoolStream.write(votePubkey + '\n');
-
         // Update the set to avoid duplicates in this run
         stakedVotePubkeys.add(votePubkey);
+        addedCount++; // Increment counter
       }
       // Else, do nothing if exists
     }
 
     addToPoolStream.end();
-
-    console.log('Processing complete.');
+    console.log(`Processing complete. Added ${addedCount} validator(s).`);
   } catch (err) {
     console.error('Error:', err);
   }
 }
-
 main();

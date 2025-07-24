@@ -8,7 +8,7 @@ const SHORTLIST_FILE = 'staking_shortlist.csv';
 const POOL_FILE = 'pool_validators.csv';
 const ADD_TO_POOL_FILE = 'add_to_pool.txt';
 
-// Define the CSV headers
+// Define the CSV headers, now including 'Validator Version'
 const headers = [
   { id: 'Vote Pubkey', title: 'Vote Pubkey' },
   { id: 'Node Pubkey', title: 'Node Pubkey' },
@@ -21,6 +21,7 @@ const headers = [
   { id: 'Status', title: 'Status' },
   { id: 'Skip Rate', title: 'Skip Rate' },
   { id: 'Latency', title: 'Latency' },
+  { id: 'Validator Version', title: 'Validator Version' }, // new header
 ];
 
 // Function to ensure pool_validators.csv exists and has headers
@@ -119,8 +120,14 @@ async function main() {
       const votePubkey = entry['Vote Pubkey'];
       if (!votePubkey) continue; // Skip if no vote pubkey
       if (!stakedVotePubkeys.has(votePubkey)) {
-        // Add new entry to pool_validators.csv
-        await csvWriter.writeRecords([entry]);
+        // Prepare a new record with all headers
+        const record = {};
+        headers.forEach(header => {
+          // Assign value from entry or empty string if missing
+          record[header.id] = entry[header.id] || '';
+        });
+        // Add the new validator to the CSV
+        await csvWriter.writeRecords([record]);
         // Append vote pubkey to add_to_pool.txt
         addToPoolStream.write(votePubkey + '\n');
         // Update the set to avoid duplicates in this run

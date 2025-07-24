@@ -8,7 +8,7 @@ const POOL_FILE = 'pool_validators.csv';
 const SHORTLIST_FILE = 'staking_shortlist.csv';
 const REMOVE_FROM_POOL_FILE = 'remove_from_pool.txt';
 
-// Define the CSV headers, now including 'Validator Version'
+// Define the CSV headers
 const headers = [
   { id: 'Vote Pubkey', title: 'Vote Pubkey' },
   { id: 'Node Pubkey', title: 'Node Pubkey' },
@@ -21,7 +21,6 @@ const headers = [
   { id: 'Status', title: 'Status' },
   { id: 'Skip Rate', title: 'Skip Rate' },
   { id: 'Latency', title: 'Latency' },
-  { id: 'Validator Version', title: 'Validator Version' }, // added header
 ];
 
 // Function to read CSV into a Map keyed by Vote Pubkey

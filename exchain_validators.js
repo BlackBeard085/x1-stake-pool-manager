@@ -122,23 +122,55 @@ async function getValidatorLatency(votePubkey) {
   }
 }
 
-// Fetch validator skip rate
-function getValidatorSkipRate(votePubkey) {
-  return runCommand(`solana validators | grep ${votePubkey} | awk '{print $11}'`)
-    .then(output => {
-      const outTrim = output.trim();
-      if (
-        outTrim === '' ||
-        outTrim.includes('N/A') ||
-        outTrim.includes('-')
-      ) {
-        return 'N/A';
-      } else {
-        return outTrim;
+// Fetch validator skip rate via new method
+async function getValidatorSkipRate(nodePubkey) {
+  try {
+    // 1. Get the current epoch
+    const epochInfoOutput = await runCommand('solana epoch-info');
+    const epochMatch = epochInfoOutput.match(/Epoch:\s*(\d+)/);
+    if (!epochMatch || !epochMatch[1]) return 'N/A';
+    const epoch = parseInt(epochMatch[1], 10);
+
+    // 2. Run block-production for epoch-1
+    const blockProdOutput = await runCommand(`solana block-production --epoch ${epoch - 1}`);
+
+    // 3. Parse output to get skip rate for the nodePubkey
+    const lines = blockProdOutput.split('\n');
+    for (const line of lines) {
+      if (line.includes(nodePubkey)) {
+        // match line containing the skip rate
+        const match = line.match(/\s*[\w\d]+.*\s*[\d]+\s*[\d]+\s*[\d]+\s*([\d.]+)%/);
+        if (match && match[1]) {
+          // ensure full number with 2 decimal places
+          const skipRateStr = parseFloat(match[1]).toFixed(2) + '%';
+          return skipRateStr;
+        }
       }
-    })
-    .catch(() => 'N/A');
+    }
+    // If not found, return 'N/A'
+    return 'N/A';
+  } catch {
+    return 'N/A';
+  }
 }
+
+// Fallback: get skip rate from 'solana validators' command
+//function getValidatorSkipRateFallback(votePubkey) {
+//  return runCommand(`solana validators | grep ${votePubkey} | awk '{print $11}'`)
+//    .then(output => {
+//      const outTrim = output.trim();
+//      if (
+//        outTrim === '' ||
+//        outTrim.includes('N/A') ||
+//        outTrim.includes('-')
+//      ) {
+//        return 'N/A';
+//      } else {
+//        return outTrim;
+//      }
+//    })
+//    .catch(() => 'N/A');
+//}
 
 // Fetch average credits with retry
 async function getAverageCredits(votePubkey) {
@@ -197,7 +229,6 @@ function readExistingCSV() {
       return lines;
     }
   }
-  // Return headers if file doesn't exist or invalid
   const header = 'Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency';
   return [header];
 }
@@ -225,11 +256,10 @@ async function main() {
     const existingLines = readExistingCSV();
     const header = existingLines[0];
     const existingData = {};
-    // Parse existing data into a map for quick lookup
     for (let i = 1; i < existingLines.length; i++) {
       const row = existingLines[i].split(',');
       const votePubkey = row[0];
-      existingData[votePubkey] = row; // store array of fields
+      existingData[votePubkey] = row;
     }
 
     // 5. Update config.json
@@ -270,7 +300,8 @@ async function main() {
         getTotalCredits(votePubkey),
         getValidatorLatency(votePubkey),
         getAverageCredits(votePubkey),
-        getValidatorSkipRate(votePubkey)
+        // Use new method for skip rate:
+        getValidatorSkipRate(nodePubkey).catch(() => 'N/A')
       ]);
 
       // Retrieve existing data if fetch failed
@@ -278,7 +309,6 @@ async function main() {
 
       const getField = (fieldName, newValue) => {
         if (newValue === null || newValue === undefined || newValue === 'N/A') {
-          // Keep existing if available
           return existing.length ? existing[fieldNameToIndex(fieldName)] : 'N/A';
         }
         return newValue;

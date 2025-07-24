@@ -138,39 +138,18 @@ async function getValidatorSkipRate(nodePubkey) {
     const lines = blockProdOutput.split('\n');
     for (const line of lines) {
       if (line.includes(nodePubkey)) {
-        // match line containing the skip rate
         const match = line.match(/\s*[\w\d]+.*\s*[\d]+\s*[\d]+\s*[\d]+\s*([\d.]+)%/);
         if (match && match[1]) {
-          // ensure full number with 2 decimal places
           const skipRateStr = parseFloat(match[1]).toFixed(2) + '%';
           return skipRateStr;
         }
       }
     }
-    // If not found, return 'N/A'
     return 'N/A';
   } catch {
     return 'N/A';
   }
 }
-
-// Fallback: get skip rate from 'solana validators' command
-//function getValidatorSkipRateFallback(votePubkey) {
-//  return runCommand(`solana validators | grep ${votePubkey} | awk '{print $11}'`)
-//    .then(output => {
-//      const outTrim = output.trim();
-//      if (
-//        outTrim === '' ||
-//        outTrim.includes('N/A') ||
-//        outTrim.includes('-')
-//      ) {
-//        return 'N/A';
-//      } else {
-//        return outTrim;
-//      }
-//    })
-//    .catch(() => 'N/A');
-//}
 
 // Fetch average credits with retry
 async function getAverageCredits(votePubkey) {
@@ -229,13 +208,42 @@ function readExistingCSV() {
       return lines;
     }
   }
-  const header = 'Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency';
+  const header = 'Vote Pubkey,Node Pubkey,Activated Stake,Commission,Last Vote,Second Epoch Credits,Total Credits,Average Credits,Status,Skip Rate,Latency,Validator Version';
   return [header];
 }
 
 // Save CSV lines
 function saveCSV(lines) {
   fs.writeFileSync('chain_validators.csv', lines.join('\n'));
+}
+
+// Fetch the list of validators with their versions
+async function getValidatorVersions() {
+  const output = await runCommand('solana validators');
+  const lines = output.split('\n');
+
+  const versionMap = {}; // Map voteAccountPubkey -> version string
+
+  // Skip header or empty lines
+  for (let line of lines) {
+    line = line.trim();
+    if (line === '' || line.startsWith('Identity')) continue;
+    // Split by whitespace, handle multiple spaces
+    const parts = line.split(/\s+/);
+    // The line format is: Identity ... Vote Account ... ... Version ...
+    // Based on the example, the Vote Account is in the 2nd column (index 1), and version in the 12th column (index 11)
+    if (parts.length >= 12) {
+      const voteAccount = parts[1];
+      const versionStr = parts[11];
+      // Validate version format (e.g., '2.2.17')
+      if (/^\d+\.\d+\.\d+$/.test(versionStr)) {
+        versionMap[voteAccount] = versionStr;
+      } else {
+        versionMap[voteAccount] = 'N/A';
+      }
+    }
+  }
+  return versionMap;
 }
 
 // Main execution
@@ -276,6 +284,10 @@ async function main() {
     fs.writeFileSync('config.json', JSON.stringify(config, null, 2));
     console.log('Updated config.json with chain slot and validator counts');
 
+    // 6. Get validator versions map
+    const validatorVersions = await getValidatorVersions();
+
+    // 7. Combine current and delinquent validators
     const allAccounts = [
       ...(result.current || []).map(acc => ({ ...acc, status: 'current' })),
       ...(result.delinquent || []).map(acc => ({ ...acc, status: 'delinquent' }))
@@ -283,7 +295,7 @@ async function main() {
 
     const newLines = [header];
 
-    // 6. Process all vote accounts
+    // 8. Process all vote accounts
     await Promise.all(allAccounts.map(async (acc) => {
       const { votePubkey, nodePubkey, activatedStake, lastVote } = acc;
       const { commission = 'N/A' } = acc;
@@ -300,9 +312,11 @@ async function main() {
         getTotalCredits(votePubkey),
         getValidatorLatency(votePubkey),
         getAverageCredits(votePubkey),
-        // Use new method for skip rate:
         getValidatorSkipRate(nodePubkey).catch(() => 'N/A')
       ]);
+
+      // Determine validator version
+      const validatorVersion = validatorVersions[votePubkey] || 'N/A';
 
       // Retrieve existing data if fetch failed
       const existing = existingData[votePubkey] || [];
@@ -331,13 +345,14 @@ async function main() {
         getField('Average Credits', averageCredits),
         acc.status,
         getField('Skip Rate', skipRate),
-        getField('Latency', latency)
+        getField('Latency', latency),
+        validatorVersion
       ];
 
       newLines.push(row.join(','));
     }));
 
-    // 7. Save updated CSV
+    // 9. Save updated CSV
     saveCSV(newLines);
     console.log('Data saved to chain_validators.csv');
 

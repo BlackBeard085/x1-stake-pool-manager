@@ -9,7 +9,7 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 const inputCsv = 'chain_validators.csv';
 const outputCsv = 'staking_shortlist.csv';
 
-// Prepare CSV writer
+// Prepare CSV writer with Validator Version column added
 const csvWriter = createObjectCsvWriter({
   path: outputCsv,
   header: [
@@ -24,6 +24,7 @@ const csvWriter = createObjectCsvWriter({
     { id: 'Status', title: 'Status' },
     { id: 'Skip Rate', title: 'Skip Rate' },
     { id: 'Latency', title: 'Latency' },
+    { id: 'Validator Version', title: 'Validator Version' }, // Added header
   ]
 });
 
@@ -34,22 +35,46 @@ function isExcluded(param) {
   return param === "-";
 }
 
+// Function to compare versions (assumes version strings like "1.2.3")
+function isVersionHigherOrEqual(v1, v2) {
+  const v1Parts = v1.split('.').map(Number);
+  const v2Parts = v2.split('.').map(Number);
+  const maxLength = Math.max(v1Parts.length, v2Parts.length);
+  for (let i = 0; i < maxLength; i++) {
+    const v1Part = v1Parts[i] || 0;
+    const v2Part = v2Parts[i] || 0;
+    if (v1Part > v2Part) return true;
+    if (v1Part < v2Part) return false;
+  }
+  return true; // versions are equal
+}
+
 // Function to check if validator meets criteria
 function isValidatorEligible(validator, chainSlot, config) {
   // Parse numerical values
   const lastVote = parseInt(validator['Last Vote'], 10);
   const secondEpochCredits = parseInt(validator['Second Epoch Credits'].replace(/\D/g, ''), 10);
   const totalCredits = parseInt(validator['Total Credits'].replace(/\D/g, ''), 10);
-  const averageCredits = parseFloat(validator['Average Credits'].replace(/[^0-9.]/g, '')); // Changed to parseFloat
+  const averageCredits = parseFloat(validator['Average Credits'].replace(/[^0-9.]/g, ''));
   const skipRateStr = validator['Skip Rate'].trim();
   const skipRate = skipRateStr.toLowerCase() === 'n/a' ? null : parseFloat(skipRateStr.replace('%', '').trim());
   const latency = parseFloat(validator['Latency']);
   const commission = parseFloat(validator['Commission']);
   const status = validator['Status'].toLowerCase();
 
-  // Convert activated stake from validator to XNT
+  // Parse activated stake from validator to XNT
   const activatedStakeRaw = validator['Activated Stake'];
   const activatedStake = parseFloat(activatedStakeRaw) / 1_000_000_000; // convert to XNT
+
+  // Validator version comparison
+  const validatorVersion = validator['Validator Version'].trim();
+  const requiredVersion = (config.validator_version || "").trim();
+
+  if (requiredVersion && validatorVersion) {
+    if (!isVersionHigherOrEqual(validatorVersion, requiredVersion)) {
+      return false;
+    }
+  }
 
   // Check status
   if (!isExcluded(config.status) && status !== config.status.toLowerCase()) {

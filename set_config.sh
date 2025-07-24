@@ -49,10 +49,13 @@ prompt() {
 # Collect inputs
 echo -e "\nEnter a value for each parameter or '-' to exclude the metric from vetting \n"
 
+# New prompt for minimum validator version
+validator_version=$(prompt "What is the minimum validator version required? (e.g., 2.2.12 or '-'): " '^[0-9]+(\.[0-9]+){0,2}$' '' '')
+
 skip_rate=$(prompt "Enter the maximum acceptable skip rate (e.g., 10 for 10%): " '^[0-9]+(\.[0-9]+)?$' 0 100)
 commission_limit=$(prompt "Enter the maximum commission the validator can charge: " '^[0-9]+(\.[0-9]+)?$' 0 100)
 min_active_stake=$(prompt "Enter the minimum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
-max_active_stake=$(prompt "Enter the maximum active stake requirment: " '^[0-9]+(\.[0-9]+)?$' '' '')
+max_active_stake=$(prompt "Enter the maximum active stake requirement: " '^[0-9]+(\.[0-9]+)?$' '' '')
 credit_limit=$(prompt "Enter the last full epoch credit requirement (0 - 8000): " '^[0-9]+$' 0 8000)
 
 # New prompt for total_credits
@@ -71,17 +74,23 @@ update_json() {
     # Update with string "-"
     jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
   else
-    # Update with numeric value
-    jq --arg key "$key" --argjson value "$value" '.[$key] = $value' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+    # Check if value is a number (integer or decimal)
+    if [[ "$value" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+      jq --arg key "$key" --argjson value "$value" '.[$key] = $value' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+    else
+      # Fallback: treat as string
+      jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_FILE}.tmp" "$CONFIG_FILE"
+    fi
   fi
 }
 
 # Update config.json with each parameter
+update_json "validator_version" "$validator_version"
 update_json "skiprate" "$skip_rate"
 update_json "last_epoch_credit_limit" "$credit_limit"
 update_json "min_active_stake" "$min_active_stake"
 update_json "max_active_stake" "$max_active_stake"
-update_json "total_credits" "$total_credits"     # Added this line
+update_json "total_credits" "$total_credits"
 update_json "latency" "$latency"
 update_json "average_credits" "$avg_credits"
 update_json "reserve" "$reserve"
@@ -93,11 +102,12 @@ jq '.status = "current"' "$CONFIG_FILE" > "${CONFIG_FILE}.tmp" && mv "${CONFIG_F
 
 # Final message
 echo "Configuration updated successfully:"
+echo " - Minimum validator version: $validator_version"
 echo " - Skip rate limit: $skip_rate%"
 echo " - Commission limit: $commission_limit"
 echo " - Min active stake: $min_active_stake"
 echo " - Max active stake: $max_active_stake"
-echo " - Total credits requirement: $total_credits"      # Added this line
+echo " - Total credits requirement: $total_credits"
 echo " - Last epoch credit limit: $credit_limit"
 echo " - Latency: $latency"
 echo " - Average credits: $avg_credits"
